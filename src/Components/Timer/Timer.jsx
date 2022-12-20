@@ -36,7 +36,7 @@ export default class Timer extends React.Component {
                     intervalId: null,
                     color: "maroon",
                 });
-
+                this.props.onTimerEnd();
             }
         }
     }
@@ -69,10 +69,10 @@ export default class Timer extends React.Component {
         return (
             <div className="timer">
                 <span className="digits" style={{ color: color }}>
-                    {(time > 60000) ? (("0" + Math.floor((time / 60000) % 60)).slice(-2) + ":") : ""}
+                    {(time >= 60000) ? (("0" + Math.floor((time / 60000) % 60)).slice(-2) + ":") : ""}
                 </span>
                 <span className="digits" style={{ color: color }}>
-                    {("0" + Math.floor((time / 1000) % 60)).slice(-2)}.
+                    {("0" + Math.floor((time / 1000) % 60)).slice((time >= 10000) ? -2 : -1)}.
                 </span>
                 <span className="digits"
                     style={{ color: color }}
