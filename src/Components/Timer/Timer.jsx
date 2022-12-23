@@ -9,7 +9,7 @@ export default class Timer extends React.Component {
             time: 0,
             intervalId: null,
             color: "white",
-        }
+        };
     }
 
     componentDidMount() {
@@ -36,7 +36,7 @@ export default class Timer extends React.Component {
                     intervalId: null,
                     color: "maroon",
                 });
-                this.props.onTimerEnd();
+                this.props.onTimerEnd(this.state.time);
             }
         }
     }

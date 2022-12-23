@@ -1,6 +1,5 @@
 import React from 'react';
 import "./CaseSelect.css";
-import "../../Constants";
 import { algsGroups, renderGroups, algsInfo } from '../../Constants';
 
 function Case(props) {
@@ -32,8 +31,8 @@ export default class CaseSelect extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selected: [],
-        }
+            selected: props.selected,
+        };
     }
 
     toggleCase(i) {
@@ -43,6 +42,7 @@ export default class CaseSelect extends React.Component {
         else
             selectedCopy.push(i);
         this.setState({selected: selectedCopy});
+        this.props.saveSelection(this.state.selected);
     }
 
     toggleGroup(group) {
@@ -55,12 +55,14 @@ export default class CaseSelect extends React.Component {
                 this.state.selected.concat(cases)
             )
         });
+        this.props.saveSelection(this.state.selected);
     }
 
     toggleAll() {
         this.setState({
             selected: this.state.selected.length > 0 ? [] : Object.keys(algsInfo).map(i => parseInt(i))
         });
+        this.props.saveSelection(this.state.selected);
     }
 
     renderCase(i) {
@@ -75,19 +77,6 @@ export default class CaseSelect extends React.Component {
                 src={"pic/" + i + ".svg"}
             />
         );
-        
-        // return (
-        //     <td
-        //         className="case"
-        //         // key={i}
-        //         onClick={() => this.toggleCase(i)}
-        //         title={algsInfo[i]["name"]}
-        //         style={{ background: bgColor }}
-        //         key={i}
-        //     >
-        //         <img width='100px' src={"pic/" + i + ".svg"} alt={algsInfo[i]["name"]}/>
-        //     </td>
-        // );
     }
 
     renderGroupHeader(group) {
@@ -99,17 +88,6 @@ export default class CaseSelect extends React.Component {
                 name={group}
             />
         );
-
-        // return (
-        //     <td
-        //         key={group}
-        //         className="groupHeader"
-        //         onClick={() => this.toggleGroup(group)}
-        //         colSpan={algsGroups[group].length}
-        //     >
-        //         {group}
-        //     </td>
-        // );
     }
 
     renderGroupCases(group) {
@@ -152,13 +130,6 @@ export default class CaseSelect extends React.Component {
                 colSpan='6'
                 name={'All Cases (57) | selected: ' + this.state.selected.length}
             /></tr>
-            /* <tr><td
-                className='groupHeader'
-                onClick={() => this.toggleAll()}
-                colSpan='6'
-            >
-                
-            </td></tr> */
         );
 
         let cases = [];
@@ -169,10 +140,32 @@ export default class CaseSelect extends React.Component {
 
         return (
             <div className="caseselect">
+            <div>
+                <h1>OLL Trainer</h1>
+                <p>
+                    Click on pictures and group headers to select/deselect cases
+                    <br/>GitHub repo: <a href='https://github.com/s-leirbag/oll-trainer'>click</a>, download offline version: <a href='https://github.com/s-leirbag/oll-trainer/archive/refs/heads/main.zip'>zip</a>
+                </p>
+            </div>
             <table><tbody>
                 {topHeader}
                 {cases}
             </tbody></table>
+            <div className="btns-right">
+                <h1>Train</h1>
+                <button
+                    onClick={() => this.props.changeMode('random')}
+                    title='Train selected cases randomly'
+                >
+                    Random
+                </button>
+                <button
+                    onClick={() => this.props.changeMode('recap')}
+                    title='Go through all the selected cases once'
+                >
+                    Recap
+                </button>
+            </div>
             </div>
         );
     }
