@@ -38,6 +38,7 @@ export default class App extends React.Component {
     this.state = {
         mode: 'caseselect', // caseselect, train
         selected: [],
+        times: [],
     };
   }
 
@@ -65,7 +66,6 @@ export default class App extends React.Component {
 
   render() {
     let app;
-    console.log(this.state.mode);
     if (this.state.mode === 'caseselect') {
       app = (
         <CaseSelect
@@ -80,6 +80,8 @@ export default class App extends React.Component {
         <Train
           mode={this.state.mode}
           selected={this.state.selected}
+          changeMode={(mode) => this.changeMode(mode)}
+          times={this.state.times}
         />
       );
     }
