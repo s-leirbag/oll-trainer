@@ -7,3 +7,7 @@ export function msToReadable(time) {
     const ms = ("0" + ((time / 10) % 100)).slice(-2);
     return minutes + seconds + ms;
 }
+
+export function logTabSep() {
+    console.log(Array.prototype.slice.call(arguments).join('\t'));
+}

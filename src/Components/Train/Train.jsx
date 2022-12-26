@@ -2,8 +2,8 @@ import React from 'react';
 import "./Train.css";
 import Timer from "../Timer/Timer.jsx";
 import { algsInfo, ollMap } from '../../Constants';
-import { msToReadable } from '../../Utils';
-import { cloneDeep, sample, isEmpty } from 'lodash';
+import { msToReadable, logTabSep } from '../../Utils';
+import { clone, cloneDeep, sample, isEmpty } from 'lodash';
 
 export default class Train extends React.Component {
     constructor(props) {
@@ -12,35 +12,41 @@ export default class Train extends React.Component {
             mode: props.mode, // random, recap
             times: props.times,
             recapArray: (props.mode === 'recap' ? props.selected : []),
-            lastScramble: '',
-            lastCase: -1,
-            currentScramble: '',
-            currentCase: -1,
+            lastEntry: {},
+            currentEntry: {},
             isBoxDisplayed: false,
         };
     }
-    
-    // makeResultInstance(time) {
-    //     return {
-    //         "time": time,
-    //         "scramble": lastScramble,
-    //         "index": this.state.times.length,
-    //         "case": lastCase,
-    //     };
-    // }
+
+    componentDidMount() {
+        window.addEventListener("keydown", this.handleKeyDown);
+        this.makeNewScramble();
+    }
+
+    handleKeyDown = (event) => {
+        if (event.key === 'Delete' || event.key === 'Backspace') {
+            if (event.shiftKey)
+                this.confirmClear();
+            else
+                this.confirmRemLast();
+        }
+    }
 
     handleTimerEnd(time) {
         let timesCopy = cloneDeep(this.state.times);
-        const currentCase = this.state.currentCase;
+        let entry = clone(this.state.currentEntry);
+        const entryCase = entry.case;
+        entry.time = time;
+        entry.ms = msToReadable(time);
 
-        if (timesCopy[currentCase] == null)
-            timesCopy[currentCase] = [];
-        timesCopy[currentCase].push(time);
+        if (timesCopy[entryCase] == null)
+            timesCopy[entryCase] = [];
+        timesCopy[entryCase].push(entry);
 
-        this.setState({times: timesCopy});
-
-        console.log(timesCopy);
-
+        this.setState({
+            times: timesCopy,
+            lastEntry: entry,
+        });
         this.makeNewScramble();
     }
 
@@ -60,12 +66,7 @@ export default class Train extends React.Component {
         const rotation = sample(["", "y", "y2", "y'"]);
         const finalAlg = this.applyAlgRotation(alg, rotation);
 
-        this.setState({
-            lastScramble: this.state.currentScramble,
-            lastCase: this.state.currentCase,
-            currentScramble: finalAlg,
-            currentCase: caseNum,
-        });
+        this.setState({ currentEntry: {scramble: finalAlg, case: caseNum} });
     }
 
     // http://stackoverflow.com/questions/15604140/replace-multiple-strings-with-multiple-other-strings
@@ -100,7 +101,27 @@ export default class Train extends React.Component {
     }
 
     confirmClear() {
+        if (window.confirm("Are you sure you want to clear session?"))
+            this.setState({times: {}});
+    }
 
+    /// requests confirmation and deletes result
+    confirmRem(caseNum, j) {
+        const ms = this.state.times[caseNum][j].ms;
+        if (window.confirm("Are you sure you want to remove this time?\n\n" + ms)) {
+            const times = cloneDeep(this.state.times);
+            times[caseNum].splice(j, 1);
+            this.setState({times: times});
+        }
+    }
+
+    confirmRemLast() {
+        const caseNum = this.state.lastEntry.case;
+        if (this.state.times[caseNum] === null || isEmpty(this.state.times[caseNum]))
+            return;
+
+        const caseTimes = this.state.times[caseNum];
+        this.confirmRem(caseNum, caseTimes[caseTimes.length - 1]);
     }
 
     applyStyle() {
@@ -142,13 +163,8 @@ export default class Train extends React.Component {
     }
 
     render() {
-        const lastScramble = this.state.lastScramble;
-        const lastCase = this.state.lastCase;
-        const currentScramble = this.state.currentScramble;
-        // const currentCase = this.state.currentCase;
-
         const times = this.state.times;
-        let timesLength;
+        let timesLength = 0;
         for (const i in times)
             timesLength += times[i].length;
 
@@ -161,48 +177,63 @@ export default class Train extends React.Component {
                 selInfo = " | random mode: " + length + " cases selected";
             else
                 selInfo = " | recap mode: " + this.state.recapArray.length + " cases left";
-            scramInfo = "scramble: " + currentScramble;
+            scramInfo = "scramble: " + this.state.currentEntry.scramble;
         }
         else {
             selInfo = "";
             scramInfo = "click \"select cases\" above and pick some OLLs to practice";
         }
 
-        if (!isEmpty(times)) {
+        const lastCase = this.state.lastEntry.case;
+        if (!isEmpty(times) && lastCase !== -1) {
             lastScramInfo = (
                 <div>
-                    Last Scramble: {lastScramble} {algsInfo[lastCase]['name']}
+                    Last Scramble: {this.state.lastEntry.scramble + ' (' + algsInfo[lastCase]['name'] + ')'}
                     <button onClick={() => this.confirmUnsel(lastCase)}>Unselect</button>
                 </div>
             );
         }
-        console.log(lastScramInfo);
 
         let timesList=[];
         if (!isEmpty(times)) {
             const keys = Object.keys(times).sort();
             for (const i of keys) {
-                let entry;
-                let sum = 0;
+                if (isEmpty(times[i]))
+                    continue;
 
-                const timesString = "";
-                const avg = sum / keys[i].length;
-                entry = (
-                    <div className='ollTimes'>
-                        <div class='ollNameHeader'>
+                let sum = 0;
+                let timesString = [];
+                for (const j in times[i]) {
+                    const entry = times[i][j];
+                    sum += entry.time;
+                    timesString.push(
+                        <span
+                            className={(entry === this.state.lastEntry) ? "timeResultBold" : "timeResult"}
+                            title={entry.scramble}
+                            onClick={() => this.confirmRem(i, j)}
+                            key={j}
+                        >
+                            {entry.ms}{(j < times[i].length - 1) ? ', ' : ''}
+                        </span>
+                    )
+                }
+                // logTabSep(sum, times[i].length, sum / times[i].length, msToReadable(1290), msToReadable(4430));
+                const avg = msToReadable(sum / times[i].length);
+                timesList.push(
+                    <div className='ollTimes' key={i}>
+                        <div className='ollNameHeader'>
                             <span
-                                class='ollNameStats'
+                                className='ollNameStats'
                                 onClick={() => this.displayBox(i)}
                             >
                                 {algsInfo[i]["name"]}
                             </span>
-                            :{msToReadable(avg)}
+                            : {avg}
                         </div>
                         {timesString}
                         <br/><br/>
                     </div>
                 );
-                timesList.push(entry);
             }
         }
 
