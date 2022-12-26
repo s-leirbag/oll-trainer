@@ -42,27 +42,29 @@ export default class CaseSelect extends React.Component {
         else
             selectedCopy.push(i);
         this.setState({selected: selectedCopy});
-        this.props.saveSelection(this.state.selected);
+        this.props.saveSelection(selectedCopy);
     }
 
     toggleGroup(group) {
         const cases = algsGroups[group];
         const selectedInGroup = cases.filter(value => this.state.selected.includes(value));
-        this.setState({
-            selected: (
-                selectedInGroup.length > 0 ?
-                this.state.selected.filter(value => !cases.includes(value)) : // difference
-                this.state.selected.concat(cases)
-            )
-        });
-        this.props.saveSelection(this.state.selected);
+        const newSelected = (
+            selectedInGroup.length > 0 ?
+            this.state.selected.filter(value => !cases.includes(value)) : // difference
+            this.state.selected.concat(cases)
+        );
+        this.setState({selected: newSelected});
+        this.props.saveSelection(newSelected);
     }
 
     toggleAll() {
-        this.setState({
-            selected: this.state.selected.length > 0 ? [] : Object.keys(algsInfo).map(i => parseInt(i))
-        });
-        this.props.saveSelection(this.state.selected);
+        const newSelected = (
+            this.state.selected.length > 0 ?
+            [] :
+            Object.keys(algsInfo).map(i => parseInt(i))
+        );
+        this.setState({selected: newSelected});
+        this.props.saveSelection(newSelected);
     }
 
     renderCase(i) {

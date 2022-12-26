@@ -1,5 +1,6 @@
 import React from 'react';
 import "./Timer.css";
+import { msToReadable } from '../../Utils';
 
 export default class Timer extends React.Component {
     constructor(props) {
@@ -67,19 +68,8 @@ export default class Timer extends React.Component {
         // const stage = this.state.stage;
         
         return (
-            <div className="timer">
-                <span className="digits" style={{ color: color }}>
-                    {(time >= 60000) ? (("0" + Math.floor((time / 60000) % 60)).slice(-2) + ":") : ""}
-                </span>
-                <span className="digits" style={{ color: color }}>
-                    {("0" + Math.floor((time / 1000) % 60)).slice((time >= 10000) ? -2 : -1)}.
-                </span>
-                <span className="digits"
-                    style={{ color: color }}
-                    // style={{ color: stage === "prep" || stage === "ending" ? color : "gray" }}
-                >
-                    {("0" + ((time / 10) % 100)).slice(-2)}
-                </span>
+            <div className="timer" style={{ color: color }}>
+                {msToReadable(time)}
             </div>
         )
     }

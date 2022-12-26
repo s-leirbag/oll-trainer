@@ -38,7 +38,7 @@ export default class App extends React.Component {
     this.state = {
         mode: 'caseselect', // caseselect, train
         selected: [],
-        times: [],
+        times: {},
     };
   }
 
