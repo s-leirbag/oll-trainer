@@ -38,30 +38,68 @@ export default class App extends React.Component {
     this.state = {
         mode: 'caseselect', // caseselect, train
         selected: [],
-        times: {},
+        times: [],
+        lastEntry: {},
+        currentEntry: {},
+        recapArray: [],
+        selChanged: false,
     };
   }
 
   componentDidMount() {
     this.loadSelection();
+    // this.loadTrainInfo();
+  }
+
+  saveTrainInfo(info) {
+    if (info.hasOwnProperty('times')) {
+      this.setState({ times: info.times });
+      saveLocal('times', JSON.stringify(info.times));
+    }
+    if (info.hasOwnProperty('lastEntry')) {
+      this.setState({ lastEntry: info.lastEntry });
+      saveLocal('lastEntry', JSON.stringify(info.lastEntry));
+    }
+    if (info.hasOwnProperty('currentEntry')) {
+      this.setState({ currentEntry: info.currentEntry });
+      saveLocal('currentEntry', JSON.stringify(info.currentEntry));
+    }
+    if (info.hasOwnProperty('recapArray')) {
+      this.setState({ recapArray: info.recapArray });
+      saveLocal('recapArray', JSON.stringify(info.recapArray));
+    }
+    // this.setState(info);
+    // return saveLocal('times', JSON.stringify(times));
+  }
+  
+  loadTrainInfo() {
+    let times = JSON.parse(loadLocal('times', '[]'));
+    if (times == null)
+      times = [];
+    this.saveTrainInfo(times);
   }
 
   saveSelection(selected) {
-    this.setState({selected: selected});
-    return saveLocal('ollSelection', JSON.stringify(selected));
+    this.setState({ selected: selected, selChanged: true });
+    return saveLocal('selected', JSON.stringify(selected));
   }
   
   loadSelection() {
-    let selected = JSON.parse(loadLocal('ollSelection', '[31,32]'));
-    // if (selected == null)
-    //   selected = [31,32];
+    let selected = JSON.parse(loadLocal('selected', '[31,32]'));
+    if (selected == null)
+      selected = [31,32];
     this.saveSelection(selected);
   }
 
   changeMode(mode) {
-    this.setState({
-      mode: mode,
-    });
+    this.setState({ mode: mode });
+    if (mode === 'recap') {
+      let newRecapArray = this.state.recapArray;
+      if (this.state.selChanged) {
+        newRecapArray = this.state.selected;
+      }
+      this.setState({ recapArray: newRecapArray, selChanged: false });
+    }
   }
 
   render() {
@@ -78,10 +116,14 @@ export default class App extends React.Component {
     else if (this.state.mode === 'random' || this.state.mode === 'recap') {
       app = (
         <Train
-          mode={this.state.mode}
           selected={this.state.selected}
+          mode={this.state.mode}
           changeMode={(mode) => this.changeMode(mode)}
+          saveTrainInfo={(info) => this.saveTrainInfo(info)}
           times={this.state.times}
+          lastEntry={this.state.lastEntry}
+          currentEntry={this.state.currentEntry}
+          recapArray={this.state.recapArray}
         />
       );
     }

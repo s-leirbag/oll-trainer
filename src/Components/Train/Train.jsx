@@ -11,9 +11,9 @@ export default class Train extends React.Component {
         this.state = {
             mode: props.mode, // random, recap
             times: props.times,
-            recapArray: (props.mode === 'recap' ? props.selected : []),
-            lastEntry: {},
-            currentEntry: {},
+            recapArray: props.recapArray,
+            lastEntry: props.lastEntry,
+            currentEntry: props.currentEntry,
             isBoxDisplayed: false,
         };
     }
@@ -23,8 +23,12 @@ export default class Train extends React.Component {
         this.makeNewScramble();
     }
 
+    componentWillUnmount() {
+        window.removeEventListener("keydown", this.handleKeyDown);
+    }
+
     handleKeyDown = (event) => {
-        if (event.key === 'Delete' || event.key === 'Backspace') {
+        if (event.key === 'Delete' || event.key === 'Backspace') {          
             if (event.shiftKey)
                 this.confirmClear();
             else
@@ -35,22 +39,17 @@ export default class Train extends React.Component {
     handleTimerEnd(time) {
         let timesCopy = cloneDeep(this.state.times);
         let entry = clone(this.state.currentEntry);
-        const entryCase = entry.case;
         entry.time = time;
         entry.ms = msToReadable(time);
+        entry.index = timesCopy.length;
 
-        if (timesCopy[entryCase] == null)
-            timesCopy[entryCase] = [];
-        timesCopy[entryCase].push(entry);
+        timesCopy.push(entry);
 
-        this.setState({
-            times: timesCopy,
-            lastEntry: entry,
-        });
+        this.setState({ times: timesCopy, lastEntry: entry });
+        this.props.saveTrainInfo({ times: timesCopy, lastEntry: entry });
         this.makeNewScramble();
     }
 
-    // !!!
     makeNewScramble() {
         let caseNum = 0;
         if (this.state.mode === 'random') {
@@ -60,13 +59,16 @@ export default class Train extends React.Component {
             if (isEmpty(recapArray))
                 recapArray = this.props.selected;
             caseNum = sample(recapArray);
-            this.setState({recapArray: recapArray.splice(recapArray.indexOf(caseNum), 1)});
+            const newRecapArray = recapArray.splice(recapArray.indexOf(caseNum), 1)
+            this.setState({ recapArray: newRecapArray });
+            this.props.saveTrainInfo({ recapArray: newRecapArray });
         }
         const alg = this.inverseScramble(sample(ollMap[caseNum]));
         const rotation = sample(["", "y", "y2", "y'"]);
         const finalAlg = this.applyAlgRotation(alg, rotation);
-
-        this.setState({ currentEntry: {scramble: finalAlg, case: caseNum} });
+        const newEntry = {scramble: finalAlg, case: caseNum};
+        this.setState({ currentEntry: newEntry });
+        this.props.saveTrainInfo({ currentEntry: newEntry })
     }
 
     // http://stackoverflow.com/questions/15604140/replace-multiple-strings-with-multiple-other-strings
@@ -95,33 +97,66 @@ export default class Train extends React.Component {
         return this.replaceAll(alg, mapObj);
     }
 
-    // !!!
-    inverseScramble(alg) {
-        return alg;
+    inverseScramble(s) {
+        // deleting parantheses and double spaces
+        s = s.replaceAll('[', " ");
+        s = s.replaceAll(']', " ");
+        s = s.replaceAll('(', " ");
+        s = s.replaceAll(')', " ");
+        while(s.indexOf("  ") !== -1)
+            s = s.replaceAll("  ", " ");
+    
+        let arr = s.split(" ");
+        let result = "";
+        for (const move of arr) {
+            if (move.length === 0)
+                continue;
+            if (move[move.length - 1] === '2')
+                result = move + " " + result;
+            else if (move[move.length - 1] === '\'')
+                result = move.substring(0, move.length - 1) + " " + result;
+            else
+                result = move + "' " + result;
+        }
+    
+        return result.substring(0, result.length-1);
     }
 
-    confirmClear() {
-        if (window.confirm("Are you sure you want to clear session?"))
-            this.setState({times: {}});
+    updateEntryIndeces(times) {
+        for (var i = 0; i < times.length; i++)
+            times[i]["index"] = i;
+        return times;
     }
 
     /// requests confirmation and deletes result
-    confirmRem(caseNum, j) {
-        const ms = this.state.times[caseNum][j].ms;
+    confirmRem(i) {
+        const ms = this.state.times[i].ms;
+        // console.log('confirmRem');
         if (window.confirm("Are you sure you want to remove this time?\n\n" + ms)) {
-            const times = cloneDeep(this.state.times);
-            times[caseNum].splice(j, 1);
-            this.setState({times: times});
+            // console.log('sure');
+            let timesCopy = cloneDeep(this.state.times);
+            timesCopy.splice(i, 1);
+            timesCopy = this.updateEntryIndeces(timesCopy);
+
+            const newLastEntry = isEmpty(timesCopy) ? {} : timesCopy[timesCopy.length - 1]
+
+            this.setState({ times: timesCopy, lastEntry: newLastEntry });
+            this.props.saveTrainInfo({ times: timesCopy, lastEntry: newLastEntry });
         }
     }
 
     confirmRemLast() {
-        const caseNum = this.state.lastEntry.case;
-        if (this.state.times[caseNum] === null || isEmpty(this.state.times[caseNum]))
+        if (isEmpty(this.state.times))
             return;
 
-        const caseTimes = this.state.times[caseNum];
-        this.confirmRem(caseNum, caseTimes[caseTimes.length - 1]);
+        this.confirmRem(this.state.times.length - 1);
+    }
+
+    confirmClear() {
+        if (window.confirm("Are you sure you want to clear session?")) {
+            this.setState({times: []});
+            this.props.saveTrainInfo({times: []});
+        }
     }
 
     applyStyle() {
@@ -164,22 +199,19 @@ export default class Train extends React.Component {
 
     render() {
         const times = this.state.times;
-        let timesLength = 0;
-        for (const i in times)
-            timesLength += times[i].length;
+        const timesLength = times.length;
 
-        const length = this.props.selected.length;
+        const nSelected = this.props.selected.length;
 
         let selInfo, scramInfo, lastScramInfo;
 
-        if (length > 0) {
+        if (nSelected > 0) {
             if (this.state.mode === 'random')
-                selInfo = " | random mode: " + length + " cases selected";
+                selInfo = " | random mode: " + nSelected + " cases selected";
             else
                 selInfo = " | recap mode: " + this.state.recapArray.length + " cases left";
             scramInfo = "scramble: " + this.state.currentEntry.scramble;
-        }
-        else {
+        } else {
             selInfo = "";
             scramInfo = "click \"select cases\" above and pick some OLLs to practice";
         }
@@ -194,32 +226,37 @@ export default class Train extends React.Component {
             );
         }
 
-        let timesList=[];
+        let groupsList=[];
         if (!isEmpty(times)) {
-            const keys = Object.keys(times).sort();
-            for (const i of keys) {
-                if (isEmpty(times[i]))
-                    continue;
+            let resultsByCase = {};
+            for (const entry of times) {
+                const caseNum = entry.case;
+                if (resultsByCase[caseNum] == null)
+                    resultsByCase[caseNum] = [];
+                resultsByCase[caseNum].push(entry);
+            }
 
+            const keys = Object.keys(resultsByCase).sort();
+            for (const i of keys) {
                 let sum = 0;
-                let timesString = [];
-                for (const j in times[i]) {
-                    const entry = times[i][j];
+                let timesList = [];
+                for (const j in resultsByCase[i]) {
+                    const entry = resultsByCase[i][j];
                     sum += entry.time;
-                    timesString.push(
+                    timesList.push(
                         <span
                             className={(entry === this.state.lastEntry) ? "timeResultBold" : "timeResult"}
                             title={entry.scramble}
-                            onClick={() => this.confirmRem(i, j)}
+                            onClick={() => this.confirmRem(entry.index)}
                             key={j}
                         >
-                            {entry.ms}{(j < times[i].length - 1) ? ', ' : ''}
+                            {entry.ms}{(j < resultsByCase[i].length - 1) ? ', ' : ''}
                         </span>
                     )
                 }
-                // logTabSep(sum, times[i].length, sum / times[i].length, msToReadable(1290), msToReadable(4430));
-                const avg = msToReadable(sum / times[i].length);
-                timesList.push(
+
+                const avg = msToReadable(sum / resultsByCase[i].length);
+                groupsList.push(
                     <div className='ollTimes' key={i}>
                         <div className='ollNameHeader'>
                             <span
@@ -230,7 +267,7 @@ export default class Train extends React.Component {
                             </span>
                             : {avg}
                         </div>
-                        {timesString}
+                        {timesList}
                         <br/><br/>
                     </div>
                 );
@@ -253,7 +290,7 @@ export default class Train extends React.Component {
                 <tr><td id="scramble" colSpan="2">{scramInfo}</td></tr>
                 <tr>
                     <td id="timer">
-                        <Timer onTimerEnd={(time) => this.handleTimerEnd(time)} />
+                        <Timer onTimerEnd={time => this.handleTimerEnd(time)} />
                     </td>
                     <td id="stats">
                         <div className="resultInfoHeader">
@@ -262,7 +299,7 @@ export default class Train extends React.Component {
                             :
                         </div>
                         <div id="times">
-                            {timesList}
+                            {groupsList}
                         </div>
                     </td>
                 </tr>
