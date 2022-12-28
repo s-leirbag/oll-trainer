@@ -10,17 +10,19 @@ export default class Train extends React.Component {
         super(props);
         this.state = {
             mode: props.mode, // random, recap
+            selected: props.selected,
             times: props.times,
             recapArray: props.recapArray,
-            lastEntry: props.lastEntry,
             currentEntry: props.currentEntry,
+            lastEntry: props.lastEntry,
             isBoxDisplayed: false,
         };
     }
 
     componentDidMount() {
         window.addEventListener("keydown", this.handleKeyDown);
-        this.makeNewScramble();
+        if (this.props.selected.length > 0)
+            this.makeNewScramble();
     }
 
     componentWillUnmount() {
@@ -50,14 +52,15 @@ export default class Train extends React.Component {
         this.makeNewScramble();
     }
 
-    makeNewScramble() {
+    makeNewScramble(selected=this.state.selected) {
         let caseNum = 0;
         if (this.state.mode === 'random') {
-            caseNum = sample(this.props.selected);
+            console.log(selected);
+            caseNum = sample(selected);
         } else {
             let recapArray = this.state.recapArray;
             if (isEmpty(recapArray))
-                recapArray = this.props.selected;
+                recapArray = this.state ;
             caseNum = sample(recapArray);
             const newRecapArray = recapArray.splice(recapArray.indexOf(caseNum), 1)
             this.setState({ recapArray: newRecapArray });
@@ -131,9 +134,7 @@ export default class Train extends React.Component {
     /// requests confirmation and deletes result
     confirmRem(i) {
         const ms = this.state.times[i].ms;
-        // console.log('confirmRem');
         if (window.confirm("Are you sure you want to remove this time?\n\n" + ms)) {
-            // console.log('sure');
             let timesCopy = cloneDeep(this.state.times);
             timesCopy.splice(i, 1);
             timesCopy = this.updateEntryIndeces(timesCopy);
@@ -153,9 +154,25 @@ export default class Train extends React.Component {
     }
 
     confirmClear() {
-        if (window.confirm("Are you sure you want to clear session?")) {
-            this.setState({times: []});
-            this.props.saveTrainInfo({times: []});
+        if (this.state.times.length > 0) {
+            if (window.confirm("Are you sure you want to clear session?")) {
+                this.setState({times: []});
+                this.props.saveTrainInfo({times: []});
+            }
+        } else {
+            alert('Session is already empty');
+        }
+    }
+
+    confirmUnsel() {
+        if (window.confirm("Do you want to unselect this case?")) {
+            const lastEntry = this.state.times[this.state.times.length - 1];
+            let selectedCopy = this.state.selected.slice();
+            selectedCopy.splice(selectedCopy.indexOf(lastEntry.case), 1);
+            this.setState({selected: selectedCopy});
+            this.props.saveSelection(selectedCopy);
+            if (selectedCopy.length > 0)
+                this.makeNewScramble(selectedCopy);
         }
     }
 
@@ -201,7 +218,7 @@ export default class Train extends React.Component {
         const times = this.state.times;
         const timesLength = times.length;
 
-        const nSelected = this.props.selected.length;
+        const nSelected = this.state.selected.length;
 
         let selInfo, scramInfo, lastScramInfo;
 
@@ -218,10 +235,13 @@ export default class Train extends React.Component {
 
         const lastCase = this.state.lastEntry.case;
         if (!isEmpty(times) && lastCase !== -1) {
+            let button = "";
+            if (this.state.selected.includes(lastCase))
+                button = <button onClick={() => this.confirmUnsel(lastCase)}>Unselect</button>;
             lastScramInfo = (
                 <div>
                     Last Scramble: {this.state.lastEntry.scramble + ' (' + algsInfo[lastCase]['name'] + ')'}
-                    <button onClick={() => this.confirmUnsel(lastCase)}>Unselect</button>
+                    {button}
                 </div>
             );
         }
@@ -290,7 +310,9 @@ export default class Train extends React.Component {
                 <tr><td id="scramble" colSpan="2">{scramInfo}</td></tr>
                 <tr>
                     <td id="timer">
-                        <Timer onTimerEnd={time => this.handleTimerEnd(time)} />
+                        <Timer
+                            isActive={nSelected > 0}
+                            onTimerEnd={time => this.handleTimerEnd(time)} />
                     </td>
                     <td id="stats">
                         <div className="resultInfoHeader">

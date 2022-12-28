@@ -117,6 +117,7 @@ export default class App extends React.Component {
       app = (
         <Train
           selected={this.state.selected}
+          saveSelection={(selected) => this.saveSelection(selected)}
           mode={this.state.mode}
           changeMode={(mode) => this.changeMode(mode)}
           saveTrainInfo={(info) => this.saveTrainInfo(info)}

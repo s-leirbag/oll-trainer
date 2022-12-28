@@ -18,11 +18,16 @@ export default class Timer extends React.Component {
         window.addEventListener("keyup", this.handleKeyUp);
     }
 
-    handleKeyDown = (event) => {
-        if (event.key === " ") {
-            if (event.repeat)
-                return;
+    componentWillUnmount() {
+        window.removeEventListener("keydown", this.handleKeyDown);
+        window.removeEventListener("keyup", this.handleKeyUp);
+    }
 
+    handleKeyDown = (event) => {
+        if (!this.props.isActive || event.repeat)
+            return;
+        
+        if (event.key === " ") {
             if (this.state.stage === "idle") {
                 this.setState({
                     stage: "prep",
@@ -43,6 +48,9 @@ export default class Timer extends React.Component {
     }
 
     handleKeyUp = (event) => {
+        if (!this.props.isActive)
+            return;
+        
         if (event.key === " ") {
             if (this.state.stage === "prep") {
                 this.setState({
