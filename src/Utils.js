@@ -9,5 +9,5 @@ export function msToReadable(time) {
 }
 
 export function logTabSep() {
-    console.log(Array.prototype.slice.call(arguments).join('\t'));
+    console.log(Array.prototype.slice.call(arguments).join('\t>'));
 }

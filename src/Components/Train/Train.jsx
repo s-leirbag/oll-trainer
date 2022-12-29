@@ -52,19 +52,18 @@ export default class Train extends React.Component {
         this.makeNewScramble();
     }
 
-    makeNewScramble(selected=this.state.selected) {
+    makeNewScramble(selected=this.props.selected) {
         let caseNum = 0;
         if (this.state.mode === 'random') {
-            console.log(selected);
             caseNum = sample(selected);
         } else {
-            let recapArray = this.state.recapArray;
-            if (isEmpty(recapArray))
-                recapArray = this.state ;
-            caseNum = sample(recapArray);
-            const newRecapArray = recapArray.splice(recapArray.indexOf(caseNum), 1)
-            this.setState({ recapArray: newRecapArray });
-            this.props.saveTrainInfo({ recapArray: newRecapArray });
+            let recapArrayCopy = clone(this.state.recapArray);
+            if (isEmpty(recapArrayCopy))
+                recapArrayCopy = clone(selected);
+            caseNum = sample(recapArrayCopy);
+            recapArrayCopy.splice(recapArrayCopy.indexOf(caseNum), 1)
+            this.setState({ recapArray: recapArrayCopy });
+            this.props.saveTrainInfo({ recapArray: recapArrayCopy });
         }
         const alg = this.inverseScramble(sample(ollMap[caseNum]));
         const rotation = sample(["", "y", "y2", "y'"]);
@@ -226,7 +225,7 @@ export default class Train extends React.Component {
             if (this.state.mode === 'random')
                 selInfo = " | random mode: " + nSelected + " cases selected";
             else
-                selInfo = " | recap mode: " + this.state.recapArray.length + " cases left";
+                selInfo = " | recap mode: " + (this.state.recapArray.length + 1) + " cases left";
             scramInfo = "scramble: " + this.state.currentEntry.scramble;
         } else {
             selInfo = "";

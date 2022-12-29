@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import CaseSelect from './Components/CaseSelect/CaseSelect.jsx';
 import Train from './Components/Train/Train.jsx';
+import { logTabSep } from './Utils';
 // import { algsGroups, renderGroups, algsInfo } from './Constants';
 
 /// \value stringified json object or standard type
@@ -36,7 +37,7 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        mode: 'caseselect', // caseselect, train
+        mode: 'caseselect', // caseselect, random, recap
         selected: [],
         times: [],
         lastEntry: {},
@@ -68,8 +69,6 @@ export default class App extends React.Component {
       this.setState({ recapArray: info.recapArray });
       saveLocal('recapArray', JSON.stringify(info.recapArray));
     }
-    // this.setState(info);
-    // return saveLocal('times', JSON.stringify(times));
   }
   
   loadTrainInfo() {
@@ -112,8 +111,8 @@ export default class App extends React.Component {
           changeMode={(mode) => this.changeMode(mode)}
         />
       );
-    }
-    else if (this.state.mode === 'random' || this.state.mode === 'recap') {
+    // random or recap
+    } else {
       app = (
         <Train
           selected={this.state.selected}
