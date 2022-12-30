@@ -15,7 +15,7 @@ export default class Train extends React.Component {
             recapArray: props.recapArray,
             currentEntry: props.currentEntry,
             lastEntry: props.lastEntry,
-            isBoxDisplayed: false,
+            caseDisplayed: -1,
         };
     }
 
@@ -179,14 +179,18 @@ export default class Train extends React.Component {
     }
 
     displayBox(i) {
-        this.setState({isBoxDisplayed: true});
+        this.setState({ caseDisplayed: i });
+    }
+
+    hideBox() {
+        this.setState({ caseDisplayed: -1 });
     }
 
     renderBox(i) {
         const name = algsInfo[i]["name"];
         return (
-            <div id="hintWindow">
-                <table id='box'>
+            <div>
+                <table id="hintWindow"><tbody>
                     <tr>
                         <td rowSpan='4'>
                             <img id='boxImg' src={"pic/" + i + ".svg"} alt={name}/>
@@ -195,19 +199,15 @@ export default class Train extends React.Component {
                             #{i} {name}
                         </td>
                     </tr>
-                    <tr>
-                        <td id='boxalg'>
-                            {algsInfo[i]["a"]}
-                            {algsInfo[i]["a2"] !== "" ? "<br><br>" + algsInfo[i]["a2"] : ""}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td id='boxsetup'>
-                            Setup: {this.inverseScramble(algsInfo[i]["a"])/* ollMap[i][0] */}
-                        </td>
-                    </tr>
-                </table>
-                <div id="hintWindowBack" onClick={() => this.hideBox()}></div> {/* might need to place outside hintWindow div */}
+                    <tr><td id='boxalg'>
+                        {algsInfo[i]["a"]}
+                        {algsInfo[i]["a2"] !== "" ? <div><br/>{algsInfo[i]["a2"]}</div> : ""}
+                    </td></tr>
+                    <tr><td id='boxsetup'>
+                        Setup: {this.inverseScramble(algsInfo[i]["a"])/* ollMap[i][0] */}
+                    </td></tr>
+                </tbody></table>
+                <div id="hintWindowBack" onClick={() => this.hideBox()}></div>
             </div>
         );
     }
@@ -295,7 +295,7 @@ export default class Train extends React.Component {
 
         return (
             <div className='train'>
-            <table><tbody>
+            <table id='mainTable'><tbody>
                 <tr><td colSpan='2'>
                     <button
                         id='selectBtn'
@@ -386,7 +386,7 @@ export default class Train extends React.Component {
                     </td>
                 </tr>
             </tbody></table>
-            {this.state.isBoxDisplayed ? this.renderBox() : ""}
+            {this.state.caseDisplayed !== -1 ? this.renderBox(this.state.caseDisplayed) : ""}
             </div>
         )
     }

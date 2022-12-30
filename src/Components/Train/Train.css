@@ -44,7 +44,7 @@ button:hover span:after {opacity: 1; right: 0;}
 	font-size: 30px;
 }
 
-table {
+table#mainTable {
 	width: 100vw;
 	height: 100vh;
 }
@@ -135,11 +135,9 @@ input[type=text] {
     font-style: italic;
 }
 
-#hintWindowBack
-{
+#hintWindowBack {
 	-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;
 	position: fixed;
-	display: none; /* hidden at the beginning */
 	left: 0;
 	top: 0;
 	z-index: 1;
@@ -150,7 +148,6 @@ input[type=text] {
 }
 
 #hintWindow {
-	display: none; /* hidden at the beginning */
 	/*-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;*/
 	position: fixed;
 	z-index: 20;
