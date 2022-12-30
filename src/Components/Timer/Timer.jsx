@@ -8,6 +8,7 @@ export default class Timer extends React.Component {
         this.state = {
             stage: "idle", // idle, prep, running, ending
             time: 0,
+            startTime: null,
             intervalId: null,
             color: "white",
         };
@@ -55,8 +56,10 @@ export default class Timer extends React.Component {
             if (this.state.stage === "prep") {
                 this.setState({
                     stage: "running",
+                    startTime: (new Date()).getTime(),
                     intervalId: setInterval(() => {
-                        this.setState({time: this.state.time + 10});
+                        this.setState({ time: (new Date()).getTime() - this.state.startTime });
+                        // this.setState({time: this.state.time + 10});
                     }, 10),
                     color: "white",
                 });
