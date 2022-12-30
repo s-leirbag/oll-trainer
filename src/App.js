@@ -49,7 +49,7 @@ export default class App extends React.Component {
 
   componentDidMount() {
     this.loadSelection();
-    // this.loadTrainInfo();
+    this.loadTrainInfo();
   }
 
   saveTrainInfo(info) {
@@ -75,7 +75,25 @@ export default class App extends React.Component {
     let times = JSON.parse(loadLocal('times', '[]'));
     if (times == null)
       times = [];
-    this.saveTrainInfo(times);
+    
+    let lastEntry = JSON.parse(loadLocal('lastEntry', '{}'));
+    if (lastEntry == null)
+      lastEntry = {};
+    
+    let currentEntry = JSON.parse(loadLocal('currentEntry', '{}'));
+    if (currentEntry == null)
+      currentEntry = {};
+
+    let recapArray = JSON.parse(loadLocal('recapArray', '{}'));
+    if (recapArray == null)
+      recapArray = {};
+    
+    this.saveTrainInfo({
+      // times: times,
+      lastEntry: lastEntry, 
+      currentEntry: currentEntry,
+      recapArray: recapArray
+    });
   }
 
   saveSelection(selected) {
@@ -94,9 +112,8 @@ export default class App extends React.Component {
     this.setState({ mode: mode });
     if (mode === 'recap') {
       let newRecapArray = this.state.recapArray;
-      if (this.state.selChanged) {
+      if (this.state.selChanged)
         newRecapArray = this.state.selected;
-      }
       this.setState({ recapArray: newRecapArray, selChanged: false });
     }
   }

@@ -44,33 +44,28 @@ export default class Train extends React.Component {
         entry.time = time;
         entry.ms = msToReadable(time);
         entry.index = timesCopy.length;
-
         timesCopy.push(entry);
 
-        this.setState({ times: timesCopy, lastEntry: entry });
-        this.props.saveTrainInfo({ times: timesCopy, lastEntry: entry });
-        this.makeNewScramble();
+        let recapArrayCopy = clone(this.state.recapArray);
+        recapArrayCopy.splice(recapArrayCopy.indexOf(entry.case), 1)
+        if (isEmpty(recapArrayCopy))
+            recapArrayCopy = clone(this.state.selected);
+
+        this.setState({ times: timesCopy, lastEntry: entry, recapArray: recapArrayCopy });
+        this.props.saveTrainInfo({ times: timesCopy, lastEntry: entry, recapArray: recapArrayCopy });
+        this.makeNewScramble(recapArrayCopy);
     }
 
-    makeNewScramble(selected=this.props.selected) {
-        let caseNum = 0;
-        if (this.state.mode === 'random') {
-            caseNum = sample(selected);
-        } else {
-            let recapArrayCopy = clone(this.state.recapArray);
-            if (isEmpty(recapArrayCopy))
-                recapArrayCopy = clone(selected);
-            caseNum = sample(recapArrayCopy);
-            recapArrayCopy.splice(recapArrayCopy.indexOf(caseNum), 1)
-            this.setState({ recapArray: recapArrayCopy });
-            this.props.saveTrainInfo({ recapArray: recapArrayCopy });
-        }
+    makeNewScramble(cases) {
+        if (cases === undefined)
+            cases = this.state.mode === 'random' ? this.state.selected : this.state.recapArray;
+        const caseNum = sample(cases);
         const alg = this.inverseScramble(sample(ollMap[caseNum]));
         const rotation = sample(["", "y", "y2", "y'"]);
         const finalAlg = this.applyAlgRotation(alg, rotation);
         const newEntry = {scramble: finalAlg, case: caseNum};
         this.setState({ currentEntry: newEntry });
-        this.props.saveTrainInfo({ currentEntry: newEntry })
+        this.props.saveTrainInfo({ currentEntry: newEntry });
     }
 
     // http://stackoverflow.com/questions/15604140/replace-multiple-strings-with-multiple-other-strings
@@ -225,7 +220,7 @@ export default class Train extends React.Component {
             if (this.state.mode === 'random')
                 selInfo = " | random mode: " + nSelected + " cases selected";
             else
-                selInfo = " | recap mode: " + (this.state.recapArray.length + 1) + " cases left";
+                selInfo = " | recap mode: " + (this.state.recapArray.length + 0) + " cases left";
             scramInfo = "scramble: " + this.state.currentEntry.scramble;
         } else {
             selInfo = "";
