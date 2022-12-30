@@ -158,15 +158,19 @@ export default class Train extends React.Component {
         }
     }
 
-    confirmUnsel() {
+    confirmUnsel(caseNum) {
         if (window.confirm("Do you want to unselect this case?")) {
-            const lastEntry = this.state.times[this.state.times.length - 1];
             let selectedCopy = this.state.selected.slice();
-            selectedCopy.splice(selectedCopy.indexOf(lastEntry.case), 1);
-            this.setState({selected: selectedCopy});
-            this.props.saveSelection(selectedCopy);
-            if (selectedCopy.length > 0)
+            selectedCopy.splice(selectedCopy.indexOf(caseNum), 1);
+
+            let newRecapArray = clone(this.state.recapArray);
+            if (selectedCopy.length > 0) {
+                newRecapArray = clone(selectedCopy);
                 this.makeNewScramble(selectedCopy);
+            }
+            this.setState({ selected: selectedCopy, recapArray: newRecapArray });
+            this.props.saveSelection(selectedCopy);
+            this.props.saveTrainInfo({recapArray: newRecapArray});
         }
     }
 
