@@ -3,7 +3,7 @@ import "./Train.css";
 import Timer from "../Timer/Timer.jsx";
 import { algsInfo, ollMap } from '../../Constants';
 import { msToReadable, logTabSep } from '../../Utils';
-import { clone, cloneDeep, sample, isEmpty } from 'lodash';
+import { clone, cloneDeep, sample, isEmpty, sortBy } from 'lodash';
 
 export default class Train extends React.Component {
     constructor(props) {
@@ -17,7 +17,6 @@ export default class Train extends React.Component {
             lastEntry: props.lastEntry,
             caseDisplayed: -1,
         };
-        logTabSep(props.selected);
     }
 
     componentDidMount() {
@@ -68,7 +67,6 @@ export default class Train extends React.Component {
         if (cases === undefined)
             cases = this.state.mode === 'random' ? this.state.selected : this.state.recapArray;
         const caseNum = sample(cases);
-        logTabSep(this.state.selected, cases);
         const alg = this.inverseScramble(sample(ollMap[caseNum]));
         const rotation = sample(["", "y", "y2", "y'"]);
         const finalAlg = this.applyAlgRotation(alg, rotation);
@@ -268,7 +266,7 @@ export default class Train extends React.Component {
                 resultsByCase[caseNum].push(entry);
             }
 
-            const keys = Object.keys(resultsByCase).sort();
+            const keys = sortBy(Object.keys(resultsByCase).map(Number));
             for (const i of keys) {
                 let sum = 0;
                 let timesList = [];
