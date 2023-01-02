@@ -97,6 +97,7 @@ export default class App extends React.Component {
   }
 
   saveSelection(selected) {
+    logTabSep(selected);
     this.setState({ selected: selected, selChanged: true });
     return saveLocal('selected', JSON.stringify(selected));
   }

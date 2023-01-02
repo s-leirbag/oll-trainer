@@ -17,6 +17,7 @@ export default class Train extends React.Component {
             lastEntry: props.lastEntry,
             caseDisplayed: -1,
         };
+        logTabSep(props.selected);
     }
 
     componentDidMount() {
@@ -46,20 +47,28 @@ export default class Train extends React.Component {
         entry.index = timesCopy.length;
         timesCopy.push(entry);
 
-        let recapArrayCopy = clone(this.state.recapArray);
-        recapArrayCopy.splice(recapArrayCopy.indexOf(entry.case), 1)
-        if (isEmpty(recapArrayCopy))
-            recapArrayCopy = clone(this.state.selected);
+        if (this.state.mode === 'random') {
+            this.makeNewScramble();
+        }
+        else {
+            let recapArrayCopy = clone(this.state.recapArray);
+            recapArrayCopy.splice(recapArrayCopy.indexOf(entry.case), 1)
+            if (isEmpty(recapArrayCopy))
+                recapArrayCopy = clone(this.state.selected);
+            this.setState({ recapArray: recapArrayCopy });
+            this.props.saveTrainInfo({ recapArray: recapArrayCopy });
+            this.makeNewScramble(recapArrayCopy);
+        }
 
-        this.setState({ times: timesCopy, lastEntry: entry, recapArray: recapArrayCopy });
-        this.props.saveTrainInfo({ times: timesCopy, lastEntry: entry, recapArray: recapArrayCopy });
-        this.makeNewScramble(recapArrayCopy);
+        this.setState({ times: timesCopy, lastEntry: entry });
+        this.props.saveTrainInfo({ times: timesCopy, lastEntry: entry });
     }
 
     makeNewScramble(cases) {
         if (cases === undefined)
             cases = this.state.mode === 'random' ? this.state.selected : this.state.recapArray;
         const caseNum = sample(cases);
+        logTabSep(this.state.selected, cases);
         const alg = this.inverseScramble(sample(ollMap[caseNum]));
         const rotation = sample(["", "y", "y2", "y'"]);
         const finalAlg = this.applyAlgRotation(alg, rotation);
@@ -160,17 +169,22 @@ export default class Train extends React.Component {
 
     confirmUnsel(caseNum) {
         if (window.confirm("Do you want to unselect this case?")) {
-            let selectedCopy = this.state.selected.slice();
-            selectedCopy.splice(selectedCopy.indexOf(caseNum), 1);
+            let newSelected = clone(this.state.selected);
+            newSelected.splice(newSelected.indexOf(caseNum), 1);
 
-            let newRecapArray = clone(this.state.recapArray);
-            if (selectedCopy.length > 0) {
-                newRecapArray = clone(selectedCopy);
-                this.makeNewScramble(selectedCopy);
+            if (newSelected.length > 0) {
+                let set = newSelected;
+                if (this.state.mode === 'recap') {
+                    let newRecapArray = clone(this.state.recapArray);
+                    newRecapArray.splice(newRecapArray.indexOf(caseNum), 1);
+                    this.setState({ recapArray: newRecapArray });
+                    this.props.saveTrainInfo({recapArray: newRecapArray});
+                    set = newRecapArray;
+                }
+                this.makeNewScramble(set);
             }
-            this.setState({ selected: selectedCopy, recapArray: newRecapArray });
-            this.props.saveSelection(selectedCopy);
-            this.props.saveTrainInfo({recapArray: newRecapArray});
+            this.setState({ selected: newSelected });
+            this.props.saveSelection(newSelected);
         }
     }
 
