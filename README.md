@@ -11,9 +11,6 @@ Customize colors, improve code, turn training elements into components not just 
 ## Credits
 
 Lots of code from https://github.com/Roman-/oll_trainer by Roman Strakhov
-
-Based the timer code off of [Geeks for Geeks' Create a Stop Watch using ReactJS](https://www.geeksforgeeks.org/create-a-stop-watch-using-reactjs/)
-
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
-
-God
+  Based the timer code off of [Geeks for Geeks' Create a Stop Watch using ReactJS](https://www.geeksforgeeks.org/create-a-stop-watch-using-reactjs/)
+  This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app)
+  God
