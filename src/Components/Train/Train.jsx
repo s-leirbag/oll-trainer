@@ -5,6 +5,120 @@ import { algsInfo, ollMap } from '../../Constants';
 import { msToReadable, logTabSep } from '../../Utils';
 import { clone, cloneDeep, sample, isEmpty, sortBy } from 'lodash';
 
+
+function HintBox(props) {
+    const i = props.i;
+    const name = algsInfo[i]["name"];
+    const alg1 = algsInfo[i]["a"];
+    const alg2 = algsInfo[i]["a2"];
+
+    return (
+        <div>
+            <table id="hintWindow"><tbody>
+                <tr>
+                    <td rowSpan='4'>
+                        <img id='boxImg' src={"pic/" + i + ".svg"} alt={name}/>
+                    </td>
+                    <td id='boxTitle'>
+                        #{i} {name}
+                    </td>
+                </tr>
+                <tr><td id='boxalg'>
+                    {alg1}
+                    {alg2 !== "" ? <div><br/>{alg2}</div> : ""}
+                </td></tr>
+                <tr><td id='boxsetup'>
+                    Setup: {props.inverseScramble(alg1)/* ollMap[i][0] */}
+                </td></tr>
+            </tbody></table>
+            <div id="hintWindowBack" onClick={() => props.hideBox()}></div>
+        </div>
+    );
+}
+
+function TimesGroup(props) {
+    let sum = 0;
+    let timesList = [];
+    for (const i in props.caseTimes) {
+        const entry = props.caseTimes[i];
+        sum += entry.time;
+        timesList.push(
+            <span
+                className={(entry === props.lastEntry) ? "timeResultBold" : "timeResult"}
+                title={entry.scramble}
+                onClick={() => props.confirmRem(entry.index)}
+                key={i}
+            >
+                {entry.ms}{(i < props.caseTimes.length - 1) ? ', ' : ''}
+            </span>
+        )
+    }
+
+    const avg = msToReadable(sum / props.caseTimes.length)
+    const name = algsInfo[props.caseNum]["name"];
+
+    return (
+        <div className='ollTimes'>
+            <div className='ollNameHeader'>
+                <span
+                    className='ollNameStats'
+                    onClick={() => props.displayBox()}
+                >
+                    {name}
+                </span>
+                : {avg}
+            </div>
+            {timesList}
+            <br/><br/>
+        </div>
+    );
+}
+
+class Stats extends React.Component {
+    getResultsByCase(times) {
+        let resultsByCase = {};
+        for (const entry of times) {
+            const caseNum = entry.case;
+            if (resultsByCase[caseNum] == null)
+                resultsByCase[caseNum] = [];
+            resultsByCase[caseNum].push(entry);
+        }
+        return resultsByCase;
+    }
+
+    render() {
+        const resultsByCase = this.getResultsByCase(this.props.times);
+        const keys = sortBy(Object.keys(resultsByCase).map(Number));
+
+        let groupsList = [];
+        for (const i of keys) {
+            groupsList.push(
+                <TimesGroup
+                    key={i}
+                    displayBox={() => this.props.displayBox(i)}
+                    confirmRem={(i) => this.props.confirmRem(i)}
+                    caseTimes={resultsByCase[i]}
+                    caseNum={i}
+                    lastEntry={this.props.lastEntry}
+                />
+            );
+        }
+
+        return (
+            <td id="stats">
+                <div className="resultInfoHeader">
+                    {this.props.times.length} times
+                    <button onClick={() => this.props.confirmClear()}>Clear</button>
+                    :
+                </div>
+                <div id="times">
+                    {groupsList}
+                </div>
+            </td>
+        );
+    }
+}
+
 export default class Train extends React.Component {
     constructor(props) {
         super(props);
@@ -198,38 +312,24 @@ export default class Train extends React.Component {
         this.setState({ caseDisplayed: -1 });
     }
 
-    renderBox(i) {
-        const name = algsInfo[i]["name"];
-        return (
-            <div>
-                <table id="hintWindow"><tbody>
-                    <tr>
-                        <td rowSpan='4'>
-                            <img id='boxImg' src={"pic/" + i + ".svg"} alt={name}/>
-                        </td>
-                        <td id='boxTitle'>
-                            #{i} {name}
-                        </td>
-                    </tr>
-                    <tr><td id='boxalg'>
-                        {algsInfo[i]["a"]}
-                        {algsInfo[i]["a2"] !== "" ? <div><br/>{algsInfo[i]["a2"]}</div> : ""}
-                    </td></tr>
-                    <tr><td id='boxsetup'>
-                        Setup: {this.inverseScramble(algsInfo[i]["a"])/* ollMap[i][0] */}
-                    </td></tr>
-                </tbody></table>
-                <div id="hintWindowBack" onClick={() => this.hideBox()}></div>
-            </div>
-        );
+    renderHintBox() {
+        let hintBox = "";
+        if (this.state.caseDisplayed !== -1) {
+            hintBox = (
+                <HintBox
+                    i={this.state.caseDisplayed}
+                    inverseScramble={(s) => this.inverseScramble(s)}
+                    hideBox={() => this.hideBox()}
+                />
+            );
+        }
+        return hintBox;
     }
 
     render() {
         const times = this.state.times;
-        const timesLength = times.length;
-
         const nSelected = this.state.selected.length;
-
+        
         let selInfo, scramInfo, lastScramInfo;
 
         if (nSelected > 0) {
@@ -256,54 +356,7 @@ export default class Train extends React.Component {
             );
         }
 
-        let groupsList=[];
-        if (!isEmpty(times)) {
-            let resultsByCase = {};
-            for (const entry of times) {
-                const caseNum = entry.case;
-                if (resultsByCase[caseNum] == null)
-                    resultsByCase[caseNum] = [];
-                resultsByCase[caseNum].push(entry);
-            }
-
-            const keys = sortBy(Object.keys(resultsByCase).map(Number));
-            for (const i of keys) {
-                let sum = 0;
-                let timesList = [];
-                for (const j in resultsByCase[i]) {
-                    const entry = resultsByCase[i][j];
-                    sum += entry.time;
-                    timesList.push(
-                        <span
-                            className={(entry === this.state.lastEntry) ? "timeResultBold" : "timeResult"}
-                            title={entry.scramble}
-                            onClick={() => this.confirmRem(entry.index)}
-                            key={j}
-                        >
-                            {entry.ms}{(j < resultsByCase[i].length - 1) ? ', ' : ''}
-                        </span>
-                    )
-                }
-
-                const avg = msToReadable(sum / resultsByCase[i].length);
-                groupsList.push(
-                    <div className='ollTimes' key={i}>
-                        <div className='ollNameHeader'>
-                            <span
-                                className='ollNameStats'
-                                onClick={() => this.displayBox(i)}
-                            >
-                                {algsInfo[i]["name"]}
-                            </span>
-                            : {avg}
-                        </div>
-                        {timesList}
-                        <br/><br/>
-                    </div>
-                );
-            }
-        }
-
+        const hintBox = this.renderHintBox();
 
         return (
             <div className='train'>
@@ -322,18 +375,16 @@ export default class Train extends React.Component {
                     <td id="timer">
                         <Timer
                             isActive={nSelected > 0}
-                            onTimerEnd={time => this.handleTimerEnd(time)} />
+                            onTimerEnd={time => this.handleTimerEnd(time)}
+                        />
                     </td>
-                    <td id="stats">
-                        <div className="resultInfoHeader">
-                            {timesLength} times
-                            <button onClick={() => this.confirmClear()}>Clear</button>
-                            :
-                        </div>
-                        <div id="times">
-                            {groupsList}
-                        </div>
-                    </td>
+                    <Stats
+                        times={times}
+                        confirmRem={(i) => this.confirmRem(i)}
+                        confirmClear={() => this.confirmClear()}
+                        lastEntry={this.state.lastEntry}
+                        displayBox={(i) => this.displayBox(i)}
+                    />
                 </tr>
                 <tr>
                     <td colSpan="2">
@@ -398,7 +449,7 @@ export default class Train extends React.Component {
                     </td>
                 </tr>
             </tbody></table>
-            {this.state.caseDisplayed !== -1 ? this.renderBox(this.state.caseDisplayed) : ""}
+            {hintBox}
             </div>
         )
     }

@@ -6,7 +6,11 @@ It's a near copy of https://github.com/Roman-/oll_trainer by Roman Strakhov but 
 
 ## To-do
 
-Customize colors, improve code, turn training elements into components not just functions, improve layout, eventually change to use something like mui
+- Customize colors
+- Improve code
+- Turn training elements into components not just functions
+- Improve layout
+- Eventually change to use something like mui
 
 ## Credits
 
