@@ -7,10 +7,12 @@ It's a near copy of https://github.com/Roman-/oll_trainer by Roman Strakhov but 
 ## To-do
 
 - Customize colors
-- Improve code
+- Improve code ;((((
 - Turn training elements into components not just functions
 - Improve layout
 - Eventually change to use something like mui
+- Add button to change between recap and random mode
+- Don't delete entry if pressing delete in text input box
 
 ## Credits
 

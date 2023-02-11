@@ -44,12 +44,16 @@ export default class App extends React.Component {
         currentEntry: {},
         recapArray: [],
         selChanged: false,
+        bgcolor_in: '#f5f5f5',
+        textcolor_in: '#000',
+        linkscolor_in: '#004411'
     };
   }
 
   componentDidMount() {
     this.loadSelection();
     this.loadTrainInfo();
+    this.loadStyle();
   }
 
   saveTrainInfo(info) {
@@ -108,6 +112,43 @@ export default class App extends React.Component {
     this.saveSelection(selected);
   }
 
+
+  //saves to localstorage
+  saveStyle(style) {
+    if (style.hasOwnProperty('bgcolor_in')) {
+      this.setState({ bgcolor_in: style.bgcolor_in });
+      saveLocal('bgcolor_in', JSON.stringify(style.bgcolor_in));
+    }
+    if (style.hasOwnProperty('textcolor_in')) {
+      this.setState({ textcolor_in: style.textcolor_in });
+      saveLocal('textcolor_in', JSON.stringify(style.textcolor_in));
+    }
+    if (style.hasOwnProperty('linkscolor_in')) {
+      this.setState({ linkscolor_in: style.linkscolor_in });
+      saveLocal('linkscolor_in', JSON.stringify(style.linkscolor_in));
+    }
+  }
+
+  loadStyle() {
+    let bgcolor_in = JSON.parse(loadLocal('bgcolor_in', ''));
+    if (bgcolor_in == null)
+      bgcolor_in = '';
+    
+    let textcolor_in = JSON.parse(loadLocal('textcolor_in', ''));
+    if (textcolor_in == null)
+      textcolor_in = '';
+    
+    let linkscolor_in = JSON.parse(loadLocal('linkscolor_in', ''));
+    if (linkscolor_in == null)
+      linkscolor_in = '';
+
+    this.saveStyle({
+      bgcolor_in: bgcolor_in, 
+      textcolor_in: textcolor_in,
+      linkscolor_in: linkscolor_in
+    });
+  }
+
   changeMode(mode) {
     this.setState({ mode: mode });
     if (mode === 'recap') {
@@ -141,6 +182,10 @@ export default class App extends React.Component {
           lastEntry={this.state.lastEntry}
           currentEntry={this.state.currentEntry}
           recapArray={this.state.recapArray}
+          saveStyle={(style) => this.saveStyle(style)}
+          bgcolor_in={this.state.bgcolor_in}
+          textcolor_in={this.state.textcolor_in}
+          linkscolor_in={this.state.linkscolor_in}
         />
       );
     }

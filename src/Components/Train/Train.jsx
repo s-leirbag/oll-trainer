@@ -5,7 +5,6 @@ import { algsInfo, ollMap } from '../../Constants';
 import { msToReadable, logTabSep } from '../../Utils';
 import { clone, cloneDeep, sample, isEmpty, sortBy } from 'lodash';
 
-
 function HintBox(props) {
     const i = props.i;
     const name = algsInfo[i]["name"];
@@ -119,6 +118,47 @@ class Stats extends React.Component {
     }
 }
 
+function SettingButtons(props) {
+    return (
+        <div>
+            {props.name}
+            <button onClick={() => props.onClick1()}>{props.buttonName1}</button>
+            <button onClick={() => props.onClick2()}>{props.buttonName2}</button>
+            <br/>
+        </div>
+    );
+}
+
+class SettingInput extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {value: this.props.default};
+    }
+  
+    handleChange(event) {
+      this.setState({value: event.target.value});
+      this.props.applyStyle({ [this.props.propertyName]: event.target.value });
+    }
+  
+    render() {
+      return (
+        // <form>
+          <label>
+            {this.props.name}
+            <input
+                className='settinginput'
+                type="text"
+                value={this.state.value}
+                onChange={(event) => this.handleChange(event)}
+                placeholder={this.props.default}
+                maxLength='12'
+            />
+          </label>
+        // </form>
+      );
+    }
+  }
+
 export default class Train extends React.Component {
     constructor(props) {
         super(props);
@@ -130,6 +170,9 @@ export default class Train extends React.Component {
             currentEntry: props.currentEntry,
             lastEntry: props.lastEntry,
             caseDisplayed: -1,
+            bgcolor_in: props.bgcolor_in,
+            textcolor_in: props.textcolor_in,
+            linkscolor_in: props.linkscolor_in,
         };
     }
 
@@ -300,8 +343,14 @@ export default class Train extends React.Component {
         }
     }
 
-    applyStyle() {
-        
+    applyStyle(style) {
+        if (style.hasOwnProperty('bgcolor_in'))
+          this.setState({ bgcolor_in: style.bgcolor_in });
+        if (style.hasOwnProperty('textcolor_in'))
+          this.setState({ textcolor_in: style.textcolor_in });
+        if (style.hasOwnProperty('linkscolor_in'))
+          this.setState({ linkscolor_in: style.linkscolor_in });
+        this.props.saveStyle(style);
     }
 
     displayBox(i) {
@@ -359,7 +408,12 @@ export default class Train extends React.Component {
         const hintBox = this.renderHintBox();
 
         return (
-            <div className='train'>
+            <div className='train'
+                style={{
+                    backgroundColor: this.state.bgcolor_in,
+                    color: this.state.textcolor_in
+                }}
+            >
             <table id='mainTable'><tbody>
                 <tr><td colSpan='2'>
                     <button
@@ -388,63 +442,48 @@ export default class Train extends React.Component {
                 </tr>
                 <tr>
                     <td colSpan="2">
-                        <div>
-                            Timer Size
-                            <button onClick={() => this.adjustSize('timer', 8)}>Increase</button>
-                            <button onClick={() => this.adjustSize('timer', -8)}>Decrease</button>
-                            <br/>
-                        </div>
-                        <div>
-                            Scramble Size
-                            <button onClick={() => this.adjustSize('scramble', 8)}>Increase</button>
-                            <button onClick={() => this.adjustSize('scramble', -8)}>Decrease</button>
-                            <br/>
-                        </div>
-                        <div>
-                            Colors
-                            <button onClick={() => this.setStyle('light')}>Light</button>
-                            <button onClick={() => this.setStyle('dark')}>Dark</button>
-                            <br/>
-                        </div>
-                        <div>
-                            Background
-                            <input
-                                type='text'
-                                value='#f5f5f5'
-                                className='settinginput'
-                                id='bgcolor_in'
-                                onChange={() => this.applyStyle()}
-                                placeholder='#f5f5f5'
-                                maxLength='12'
-                            />
-                            <br/>
-                        </div>
-                        <div>
-                            Text
-                            <input
-                                type='text'
-                                value='black'
-                                className='settinginput'
-                                id='textcolor_in'
-                                onChange={() => this.applyStyle()}
-                                placeholder='#000'
-                                maxLength='12'
-                            />
-                            <br/>
-                        </div>
-                        <div>
-                            Link
-                            <input
-                                type='text'
-                                value='#004411'
-                                className='settinginput'
-                                id='linkscolor_in'
-                                onChange={() => this.applyStyle()}
-                                placeholder='#004411'
-                                maxLength='12'
-                            />
-                            <br/>
-                        </div>
+                        <SettingButtons
+                            name='Timer Size'
+                            onClick1={() => this.adjustSize('timer', 8)}
+                            onClick2={() => this.adjustSize('timer', -8)}
+                            buttonName1='Increase'
+                            buttonName2='Decrease'
+                        />
+                        <SettingButtons
+                            name='Scramble Size'
+                            onClick1={() => this.adjustSize('scramble', 8)}
+                            onClick2={() => this.adjustSize('scramble', -8)}
+                            buttonName1='Increase'
+                            buttonName2='Decrease'
+                        />
+                        <SettingButtons
+                            name='Colors'
+                            onClick1={() => this.setStyle('light', 8)}
+                            onClick2={() => this.setStyle('dark', -8)}
+                            buttonName1='Light'
+                            buttonName2='Dark'
+                        />
+                        <SettingInput
+                            name='Background'
+                            propertyName='bgcolor_in'
+                            default='#f5f5f5'
+                            id='bgcolor_in'
+                            applyStyle={(style) => this.applyStyle(style)}
+                        />
+                        <SettingInput
+                            name='Text'
+                            propertyName='textcolor_in'
+                            default='#000'
+                            id='textcolor_in'
+                            applyStyle={(style) => this.applyStyle(style)}
+                        />
+                        <SettingInput
+                            name='Link'
+                            propertyName='linkscolor_in'
+                            default='#004411'
+                            id='linkscolor_in'
+                            applyStyle={(style) => this.applyStyle(style)}
+                        />
                         {lastScramInfo}
                     </td>
                 </tr>
