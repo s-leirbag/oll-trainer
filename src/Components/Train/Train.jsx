@@ -131,31 +131,30 @@ function SettingButtons(props) {
 
 class SettingInput extends React.Component {
     constructor(props) {
-      super(props);
-      this.state = {value: this.props.default};
+        super(props);
+        this.state = {value: this.props.value};
     }
-  
+
     handleChange(event) {
-      this.setState({value: event.target.value});
-      this.props.applyStyle({ [this.props.propertyName]: event.target.value });
+        this.setState({value: event.target.value});
+        this.props.applyStyle({ [this.props.propertyName]: event.target.value });
+        logTabSep('handleChange', this.props.propertyName, event.target.value);
     }
-  
+
     render() {
-      return (
-        // <form>
-          <label>
-            {this.props.name}
-            <input
-                className='settinginput'
-                type="text"
-                value={this.state.value}
-                onChange={(event) => this.handleChange(event)}
-                placeholder={this.props.default}
-                maxLength='12'
-            />
-          </label>
-        // </form>
-      );
+        return (
+            <label>
+                {this.props.name}
+                <input
+                    className='settinginput'
+                    type="text"
+                    value={this.state.value}
+                    onChange={(event) => this.handleChange(event)}
+                    placeholder={this.props.default}
+                    maxLength='12'
+                />
+            </label>
+        );
     }
   }
 
@@ -170,9 +169,6 @@ export default class Train extends React.Component {
             currentEntry: props.currentEntry,
             lastEntry: props.lastEntry,
             caseDisplayed: -1,
-            bgcolor_in: props.bgcolor_in,
-            textcolor_in: props.textcolor_in,
-            linkscolor_in: props.linkscolor_in,
         };
     }
 
@@ -343,16 +339,6 @@ export default class Train extends React.Component {
         }
     }
 
-    applyStyle(style) {
-        if (style.hasOwnProperty('bgcolor_in'))
-          this.setState({ bgcolor_in: style.bgcolor_in });
-        if (style.hasOwnProperty('textcolor_in'))
-          this.setState({ textcolor_in: style.textcolor_in });
-        if (style.hasOwnProperty('linkscolor_in'))
-          this.setState({ linkscolor_in: style.linkscolor_in });
-        this.props.saveStyle(style);
-    }
-
     displayBox(i) {
         this.setState({ caseDisplayed: i });
     }
@@ -408,12 +394,7 @@ export default class Train extends React.Component {
         const hintBox = this.renderHintBox();
 
         return (
-            <div className='train'
-                style={{
-                    backgroundColor: this.state.bgcolor_in,
-                    color: this.state.textcolor_in
-                }}
-            >
+            <div className='train'>
             <table id='mainTable'><tbody>
                 <tr><td colSpan='2'>
                     <button
@@ -466,23 +447,26 @@ export default class Train extends React.Component {
                         <SettingInput
                             name='Background'
                             propertyName='bgcolor_in'
+                            value={this.props.bgcolor_in}
                             default='#f5f5f5'
                             id='bgcolor_in'
-                            applyStyle={(style) => this.applyStyle(style)}
+                            applyStyle={(style) => this.props.applyStyle(style)}
                         />
                         <SettingInput
                             name='Text'
                             propertyName='textcolor_in'
-                            default='#000'
+                            value={this.props.textcolor_in}
+                            default='#000000'
                             id='textcolor_in'
-                            applyStyle={(style) => this.applyStyle(style)}
+                            applyStyle={(style) => this.props.applyStyle(style)}
                         />
                         <SettingInput
                             name='Link'
                             propertyName='linkscolor_in'
+                            value={this.props.linkscolor_in}
                             default='#004411'
                             id='linkscolor_in'
-                            applyStyle={(style) => this.applyStyle(style)}
+                            applyStyle={(style) => this.props.applyStyle(style)}
                         />
                         {lastScramInfo}
                     </td>

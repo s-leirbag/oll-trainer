@@ -1,5 +1,4 @@
 .caseselect{
-    background-color: #ffffff;
     /* display: flex; */
     /* width: 100%;
     height: 100%; */
@@ -20,7 +19,6 @@ td.case {
 td.groupHeader {
     cursor: pointer;
     -moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;
-    color: black;
     border-bottom: 2px solid;
 }
 
@@ -31,7 +29,6 @@ td {border: 1px solid #000;}
     right: 2px;
     top: 2px;
     /* font-size: 30px; */
-    /* background-color: white; */
 }
 
 /* done button that appends ">" on hover */

@@ -45,7 +45,7 @@ export default class App extends React.Component {
         recapArray: [],
         selChanged: false,
         bgcolor_in: '#f5f5f5',
-        textcolor_in: '#000',
+        textcolor_in: '#000000',
         linkscolor_in: '#004411'
     };
   }
@@ -112,16 +112,20 @@ export default class App extends React.Component {
     this.saveSelection(selected);
   }
 
+  applyStyle(style) {
+    this.saveStyle(style);
+  }
 
-  //saves to localstorage
   saveStyle(style) {
     if (style.hasOwnProperty('bgcolor_in')) {
       this.setState({ bgcolor_in: style.bgcolor_in });
       saveLocal('bgcolor_in', JSON.stringify(style.bgcolor_in));
+      logTabSep('bg', style.bgcolor_in);
     }
     if (style.hasOwnProperty('textcolor_in')) {
       this.setState({ textcolor_in: style.textcolor_in });
       saveLocal('textcolor_in', JSON.stringify(style.textcolor_in));
+      logTabSep('text', style.textcolor_in);
     }
     if (style.hasOwnProperty('linkscolor_in')) {
       this.setState({ linkscolor_in: style.linkscolor_in });
@@ -182,7 +186,8 @@ export default class App extends React.Component {
           lastEntry={this.state.lastEntry}
           currentEntry={this.state.currentEntry}
           recapArray={this.state.recapArray}
-          saveStyle={(style) => this.saveStyle(style)}
+          applyStyle={(style) => this.applyStyle(style)}
+          // saveStyle={(style) => this.saveStyle(style)}
           bgcolor_in={this.state.bgcolor_in}
           textcolor_in={this.state.textcolor_in}
           linkscolor_in={this.state.linkscolor_in}
@@ -191,7 +196,12 @@ export default class App extends React.Component {
     }
 
     return (
-      <div className="App">
+      <div className="App"
+        style={{
+          backgroundColor: this.state.bgcolor_in,
+          color: this.state.textcolor_in
+        }}
+      >
         {app}
       </div>
     );

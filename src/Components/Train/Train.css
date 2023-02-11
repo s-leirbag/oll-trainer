@@ -1,21 +1,3 @@
-.selected {
-    font-size: 20px;
-    border: 1px solid #000;
-    background-color:#ee9;
-    cursor: pointer;
-    padding: 3px;
-    -moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;
-}
-
-.unselected {
-    font-size: 20px;
-    border: 1px solid #aaa;
-    background-color:#eee;
-    cursor: pointer;
-    padding: 3px;
-    -moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;
-}
-
 /* done button that appends ">" on hover */
 button {
     float: none;
