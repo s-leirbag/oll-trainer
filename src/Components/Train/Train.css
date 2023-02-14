@@ -133,7 +133,7 @@ input[type=text] {
 	/*-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;*/
 	position: fixed;
 	z-index: 20;
-	background-color: #eee;
+	/* background-color: #eee; */
     top: 40%;
     left: 50%;
     -webkit-transform: translate(-50%, -50%);

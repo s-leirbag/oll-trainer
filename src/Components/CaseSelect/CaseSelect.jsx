@@ -68,7 +68,7 @@ export default class CaseSelect extends React.Component {
     }
 
     renderCase(i) {
-        const bgColor = this.state.selected.includes(i) ? 'yellow' : 'white';
+        const bgColor = this.state.selected.includes(i) ? 'yellow' : this.props.bgcolor_in;
         
         return (
             <Case

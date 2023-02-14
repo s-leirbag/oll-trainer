@@ -10,7 +10,7 @@ export default class Timer extends React.Component {
             time: 0,
             startTime: null,
             intervalId: null,
-            color: "white",
+            color: props.color,
         };
     }
 
@@ -61,13 +61,13 @@ export default class Timer extends React.Component {
                         this.setState({ time: (new Date()).getTime() - this.state.startTime });
                         // this.setState({time: this.state.time + 10});
                     }, 10),
-                    color: "white",
+                    color: this.props.color,
                 });
             }
             else if (this.state.stage === "ending") {
                 this.setState({
                     stage: "idle",
-                    color: "white",
+                    color: this.props.color,
                 });
             }
         }

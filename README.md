@@ -7,10 +7,13 @@ It's a near copy of https://github.com/Roman-/oll_trainer by Roman Strakhov but 
 ## To-do
 
 - Host online!
-- Colors
+- UI Customization
+  - Fix timer color not changing immediately
   - Add color customization input fields to both pages
   - Don't delete entry if pressing delete in text input box
   - Presets
+  - Font size changing
+  - Accent color
 - Refactor/make code readable ;((((
   - Turn training elements into components not just functions
 - Improve layout

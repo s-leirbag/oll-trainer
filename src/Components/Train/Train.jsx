@@ -138,7 +138,6 @@ class SettingInput extends React.Component {
     handleChange(event) {
         this.setState({value: event.target.value});
         this.props.applyStyle({ [this.props.propertyName]: event.target.value });
-        logTabSep('handleChange', this.props.propertyName, event.target.value);
     }
 
     render() {
@@ -169,6 +168,7 @@ export default class Train extends React.Component {
             currentEntry: props.currentEntry,
             lastEntry: props.lastEntry,
             caseDisplayed: -1,
+            // textcolor_in: props.textcolor_in
         };
     }
 
@@ -411,6 +411,7 @@ export default class Train extends React.Component {
                         <Timer
                             isActive={nSelected > 0}
                             onTimerEnd={time => this.handleTimerEnd(time)}
+                            color={this.props.textcolor_in}
                         />
                     </td>
                     <Stats

@@ -120,12 +120,10 @@ export default class App extends React.Component {
     if (style.hasOwnProperty('bgcolor_in')) {
       this.setState({ bgcolor_in: style.bgcolor_in });
       saveLocal('bgcolor_in', JSON.stringify(style.bgcolor_in));
-      logTabSep('bg', style.bgcolor_in);
     }
     if (style.hasOwnProperty('textcolor_in')) {
       this.setState({ textcolor_in: style.textcolor_in });
       saveLocal('textcolor_in', JSON.stringify(style.textcolor_in));
-      logTabSep('text', style.textcolor_in);
     }
     if (style.hasOwnProperty('linkscolor_in')) {
       this.setState({ linkscolor_in: style.linkscolor_in });
@@ -171,6 +169,7 @@ export default class App extends React.Component {
           selected={this.state.selected}
           saveSelection={(selected) => this.saveSelection(selected)}
           changeMode={(mode) => this.changeMode(mode)}
+          bgcolor_in={this.state.bgcolor_in}
         />
       );
     // random or recap
