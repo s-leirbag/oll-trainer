@@ -1,6 +1,5 @@
 import React from 'react';
 import "./Button.css";
-import { defaultPreset, stylePresets } from '../../StylePresets';
 
 export default class Button extends React.Component {
     constructor(props) {
@@ -8,12 +7,6 @@ export default class Button extends React.Component {
         this.state = {
             backgroundColor: props.styleSettings.buttonColor,
         };
-    }
-
-    componentDidMount() {
-    }
-
-    componentWillUnmount() {
     }
 
     handleOnMouseEnter() {

@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import { defaultPreset, stylePresets } from './StylePresets.js';
+import Egg from './Components/Button/Egg.jsx'
 import CaseSelect from './Components/CaseSelect/CaseSelect.jsx';
 import Train from './Components/Train/Train.jsx';
 // import { logTabSep } from './Utils';
@@ -177,7 +178,7 @@ export default class App extends React.Component {
       );
     }
 
-    let style = this.state.style;
+    const style = this.state.style;
 
     return (
       <div className="App"
@@ -187,6 +188,7 @@ export default class App extends React.Component {
         }}
       >
         {app}
+        <Egg styleSettings={style}/>
       </div>
     );
   }

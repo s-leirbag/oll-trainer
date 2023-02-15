@@ -15,7 +15,7 @@ function HintBox(props) {
 
     return (
         <div>
-            <table id="hintWindow"><tbody>
+            <table id="hintWindow" style={{backgroundColor: props.styleSettings.backgroundColor}}><tbody>
                 <tr>
                     <td rowSpan='4'>
                         <img id='boxImg' src={"pic/" + i + ".svg"} alt={name}/>
@@ -378,6 +378,7 @@ export default class Train extends React.Component {
                     i={this.state.caseDisplayed}
                     inverseScramble={(s) => this.inverseScramble(s)}
                     hideBox={() => this.hideBox()}
+                    styleSettings={this.props.styleSettings}
                 />
             );
         }

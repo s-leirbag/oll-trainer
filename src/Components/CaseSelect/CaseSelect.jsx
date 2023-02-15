@@ -69,7 +69,7 @@ export default class CaseSelect extends React.Component {
     }
 
     renderCase(i) {
-        let style = this.props.styleSettings;
+        const style = this.props.styleSettings;
         // const backgroundColor = this.state.selected.includes(i) ? 'yellow' : style.backgroundColor;
         const backgroundColor = this.state.selected.includes(i) ? style.accentColor : style.backgroundColor;
         
@@ -128,7 +128,7 @@ export default class CaseSelect extends React.Component {
     }
 
     render() {
-        let style = this.props.styleSettings;
+        const style = this.props.styleSettings;
         const topHeader = (
             <tr><GroupHeader
                 key='allHeader'
