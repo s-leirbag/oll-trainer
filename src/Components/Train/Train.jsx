@@ -175,6 +175,10 @@ export default class Train extends React.Component {
             currentEntry: props.currentEntry,
             lastEntry: props.lastEntry,
             caseDisplayed: -1,
+            sizes: {
+                'timer': 90,
+                'scramble': 20,
+            }
         };
     }
 
@@ -346,7 +350,9 @@ export default class Train extends React.Component {
     }
 
     adjustSize(element, increment) {
-        console.log('adjust ' + element + ' size by ' + increment);
+        let sizes = this.state.sizes;
+        sizes[element] += increment;
+        this.setState({ sizes: sizes });
     }
 
     setStyle(preset) {
@@ -411,6 +417,8 @@ export default class Train extends React.Component {
 
         const hintBox = this.renderHintBox();
 
+        let sizes = this.state.sizes;
+        console.log(sizes);
         return (
             <div className='train'>
             <table id='mainTable'><tbody>
@@ -422,13 +430,15 @@ export default class Train extends React.Component {
                     />
                     {selInfo}
                 </td></tr>
-                <tr><td id="scramble" colSpan="2">{scramInfo}</td></tr>
+                <tr><td id="scramble" colSpan="2" style={{ fontSize: sizes['scramble'] }} >{scramInfo}</td></tr>
                 <tr>
                     <td id="timer">
                         <Timer
                             isActive={nSelected > 0}
                             onTimerEnd={time => this.handleTimerEnd(time)}
-                            color={this.props.styleSettings.textColor}
+                            regularColor={this.props.styleSettings.textColor}
+                            prepColor={this.props.styleSettings.accentColor}
+                            fontSize={sizes['timer']}
                         />
                     </td>
                     <Stats

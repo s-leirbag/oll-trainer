@@ -114,26 +114,16 @@ export default class App extends React.Component {
   saveStyle(newStyle) {
     let style = this.state.style;
 
-    if (newStyle.hasOwnProperty('backgroundColor')) {
+    if (newStyle.hasOwnProperty('backgroundColor'))
       style.backgroundColor = newStyle.backgroundColor;
-      // saveLocal('backgroundColor', JSON.stringify(style.backgroundColor));
-    }
-    if (newStyle.hasOwnProperty('buttonColor')) {
+    if (newStyle.hasOwnProperty('buttonColor'))
       style.buttonColor = newStyle.buttonColor;
-      // saveLocal('buttonColor', JSON.stringify(style.buttonColor));
-    }
-    if (newStyle.hasOwnProperty('textColor')) {
+    if (newStyle.hasOwnProperty('textColor'))
       style.textColor = newStyle.textColor;
-      // saveLocal('textColor', JSON.stringify(style.textColor));
-    }
-    if (newStyle.hasOwnProperty('linkColor')) {
+    if (newStyle.hasOwnProperty('linkColor'))
       style.linkColor = newStyle.linkColor;
-      // saveLocal('linkColor', JSON.stringify(style.linkColor));
-    }
-    if (newStyle.hasOwnProperty('accentColor')) {
+    if (newStyle.hasOwnProperty('accentColor'))
       style.accentColor = newStyle.accentColor;
-      // saveLocal('accentColor', JSON.stringify(style.accentColor));
-    }
 
     this.setState({ style: style })
     saveLocal('style', JSON.stringify(style));
@@ -142,37 +132,8 @@ export default class App extends React.Component {
   loadStyle() {
     let style = JSON.parse(loadLocal('style', ''));
     if (style == null)
-      this.saveStyle('dark');
-
-    this.setState({ style: style });
-
-    // let backgroundColor = JSON.parse(loadLocal('backgroundColor', ''));
-    // if (backgroundColor == null)
-    //   backgroundColor = '';
-
-    // let buttonColor = JSON.parse(loadLocal('buttonColor', ''));
-    // if (buttonColor == null)
-    // buttonColor = '';
-    
-    // let textColor = JSON.parse(loadLocal('textColor', ''));
-    // if (textColor == null)
-    //   textColor = '';
-    
-    // let linkColor = JSON.parse(loadLocal('linkColor', ''));
-    // if (linkColor == null)
-    //   linkColor = '';
-    
-    // let accentColor = JSON.parse(loadLocal('accentColor', ''));
-    // if (accentColor == null)
-    //   accentColor = '';
-
-    // this.saveStyle({
-    //   backgroundColor: backgroundColor,
-    //   buttonColor,
-    //   textColor: textColor,
-    //   linkColor: linkColor,
-    //   accentColor: accentColor,
-    // });
+      style = stylePresets[defaultPreset];
+    this.saveStyle(style);
   }
 
   changeMode(mode) {

@@ -9,7 +9,6 @@ button:hover {}
 button:hover span:after {opacity: 1; right: 0;}
 
 #scramble {
-    font-size: 20px;
     text-align: left;
 }
 

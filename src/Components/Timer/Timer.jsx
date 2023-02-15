@@ -2,6 +2,8 @@ import React from 'react';
 import "./Timer.css";
 import { msToReadable } from '../../Utils';
 
+// Timer simplify color codes/stages code
+
 export default class Timer extends React.Component {
     constructor(props) {
         super(props);
@@ -10,7 +12,9 @@ export default class Timer extends React.Component {
             time: 0,
             startTime: null,
             intervalId: null,
-            color: props.color,
+            color: props.regularColor,
+            regularColor: props.regularColor,
+            prepColor: props.prepColor,
         };
     }
 
@@ -33,7 +37,7 @@ export default class Timer extends React.Component {
                 this.setState({
                     stage: "prep",
                     time: 0,
-                    color: "green",
+                    color: this.state.prepColor,
                 });
             }
             else if (this.state.stage === "running") {
@@ -41,7 +45,7 @@ export default class Timer extends React.Component {
                 this.setState({
                     stage: "ending",
                     intervalId: null,
-                    color: "maroon",
+                    color: this.state.regularColor,
                 });
                 this.props.onTimerEnd(this.state.time);
             }
@@ -61,13 +65,13 @@ export default class Timer extends React.Component {
                         this.setState({ time: (new Date()).getTime() - this.state.startTime });
                         // this.setState({time: this.state.time + 10});
                     }, 10),
-                    color: this.props.color,
+                    color: this.state.regularColor,
                 });
             }
             else if (this.state.stage === "ending") {
                 this.setState({
                     stage: "idle",
-                    color: this.props.color,
+                    color: this.state.regularColor,
                 });
             }
         }
@@ -75,11 +79,10 @@ export default class Timer extends React.Component {
 
     render() {
         const time = this.state.time;
-        const color = this.state.color;
         // const stage = this.state.stage;
         
         return (
-            <div className="timer" style={{ color: color }}>
+            <div className="timer" style={{ color: this.state.color, fontSize: this.props.fontSize }}>
                 {msToReadable(time)}
             </div>
         )
