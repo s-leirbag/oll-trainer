@@ -9,12 +9,9 @@ It's a near copy of https://github.com/Roman-/oll_trainer by Roman Strakhov but 
 ## To-do
 
 - UI Customization
-  - Accent color (main text color, background color, links, timer colors, sticker colors, highlight case color, button color, hover)
-  - Presets
-  - Font size changing
+  - Accent color/other color customization
   - Add color customization input fields to both pages
-  - Fix timer color not changing immediately
-  - Don't delete entry if pressing delete in text input box
+  - Note: colors are (main text, background, links, timer, stickers, highlight case, button/hover)
 - Refactor/make code readable ;((((
   - Turn training elements into components not just functions
 - Improve layout

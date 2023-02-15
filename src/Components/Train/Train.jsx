@@ -356,11 +356,8 @@ export default class Train extends React.Component {
     }
 
     setStyle(preset) {
-        if (preset === "dark") {
-            let style = stylePresets[preset];
-            this.props.applyStyle(style);
-        }
-        // this.props.applyStyle(stylePresets[preset]);
+        const style = stylePresets[preset];
+        this.props.applyStyle(style);
     }
 
     displayBox(i) {
@@ -418,7 +415,6 @@ export default class Train extends React.Component {
         const hintBox = this.renderHintBox();
 
         let sizes = this.state.sizes;
-        console.log(sizes);
         return (
             <div className='train'>
             <table id='mainTable'><tbody>
@@ -453,8 +449,8 @@ export default class Train extends React.Component {
                     <td colSpan="2">
                         <SettingButtons
                             name='Timer Size'
-                            onClick1={() => this.adjustSize('timer', 8)}
-                            onClick2={() => this.adjustSize('timer', -8)}
+                            onClick1={() => this.adjustSize('timer', 16)}
+                            onClick2={() => this.adjustSize('timer', -16)}
                             buttonName1='Increase'
                             buttonName2='Decrease'
                         />

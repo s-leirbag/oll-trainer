@@ -3,7 +3,8 @@ import './App.css';
 import { defaultPreset, stylePresets } from './StylePresets.js';
 import CaseSelect from './Components/CaseSelect/CaseSelect.jsx';
 import Train from './Components/Train/Train.jsx';
-import { logTabSep } from './Utils';
+// import { logTabSep } from './Utils';
+import { clone } from 'lodash';
 // import { algsGroups, renderGroups, algsInfo } from './Constants';
 
 /// \value stringified json object or standard type
@@ -45,14 +46,14 @@ export default class App extends React.Component {
         currentEntry: {},
         recapArray: [],
         selChanged: false,
-        style: stylePresets[defaultPreset],
+        style: clone(stylePresets[defaultPreset]),
     };
   }
 
   componentDidMount() {
     this.loadSelection();
     this.loadTrainInfo();
-    this.loadStyle();
+    // this.loadStyle();
   }
 
   saveTrainInfo(info) {
@@ -126,13 +127,13 @@ export default class App extends React.Component {
       style.accentColor = newStyle.accentColor;
 
     this.setState({ style: style })
-    saveLocal('style', JSON.stringify(style));
+    // saveLocal('style', JSON.stringify(style));
   }
 
   loadStyle() {
     let style = JSON.parse(loadLocal('style', ''));
     if (style == null)
-      style = stylePresets[defaultPreset];
+      style = clone(stylePresets[defaultPreset]);
     this.saveStyle(style);
   }
 

@@ -12,9 +12,6 @@ export default class Timer extends React.Component {
             time: 0,
             startTime: null,
             intervalId: null,
-            color: props.regularColor,
-            regularColor: props.regularColor,
-            prepColor: props.prepColor,
         };
     }
 
@@ -37,7 +34,6 @@ export default class Timer extends React.Component {
                 this.setState({
                     stage: "prep",
                     time: 0,
-                    color: this.state.prepColor,
                 });
             }
             else if (this.state.stage === "running") {
@@ -45,7 +41,6 @@ export default class Timer extends React.Component {
                 this.setState({
                     stage: "ending",
                     intervalId: null,
-                    color: this.state.regularColor,
                 });
                 this.props.onTimerEnd(this.state.time);
             }
@@ -63,15 +58,12 @@ export default class Timer extends React.Component {
                     startTime: (new Date()).getTime(),
                     intervalId: setInterval(() => {
                         this.setState({ time: (new Date()).getTime() - this.state.startTime });
-                        // this.setState({time: this.state.time + 10});
                     }, 10),
-                    color: this.state.regularColor,
                 });
             }
             else if (this.state.stage === "ending") {
                 this.setState({
                     stage: "idle",
-                    color: this.state.regularColor,
                 });
             }
         }
@@ -79,10 +71,17 @@ export default class Timer extends React.Component {
 
     render() {
         const time = this.state.time;
-        // const stage = this.state.stage;
+        const stage = this.state.stage;
+        let color = stage === "prep" ? this.props.prepColor : this.props.regularColor;
         
         return (
-            <div className="timer" style={{ color: this.state.color, fontSize: this.props.fontSize }}>
+            <div
+                className="timer"
+                style={{
+                    color: color,
+                    fontSize: this.props.fontSize,
+                }}
+            >
                 {msToReadable(time)}
             </div>
         )
