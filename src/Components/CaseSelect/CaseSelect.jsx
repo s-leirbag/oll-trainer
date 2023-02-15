@@ -160,14 +160,16 @@ export default class CaseSelect extends React.Component {
             <div className="btns-right">
                 <h1>Train</h1>
                 <Button
+                    name='Random'
                     onClick={() => this.props.changeMode('random')}
                     title='Train selected cases randomly'
-                    name='Random'
+                    styleSettings={this.props.styleSettings}
                 />
                 <Button
+                    name='Recap'
                     onClick={() => this.props.changeMode('recap')}
                     title='Go through all the selected cases once'
-                    name='Recap'
+                    styleSettings={this.props.styleSettings}
                 />
             </div>
             </div>

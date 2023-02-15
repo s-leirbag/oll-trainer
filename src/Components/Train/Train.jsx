@@ -88,6 +88,7 @@ class Stats extends React.Component {
     }
 
     render() {
+        // console.log("stats " + this.props.styleSettings);
         const resultsByCase = this.getResultsByCase(this.props.times);
         const keys = sortBy(Object.keys(resultsByCase).map(Number));
 
@@ -109,7 +110,7 @@ class Stats extends React.Component {
             <td id="stats">
                 <div className="resultInfoHeader">
                     {this.props.times.length} times
-                    <Button onClick={() => this.props.confirmClear()} name='Clear'/>
+                    <Button name='Clear' onClick={() => this.props.confirmClear()} styleSettings={this.props.styleSettings}/>
                     :
                 </div>
                 <div id="times">
@@ -125,12 +126,14 @@ function SettingButtons(props) {
         <div>
             {props.name}
             <Button
-                onClick={() => props.onClick1()}
                 name={props.buttonName1}
+                onClick={() => props.onClick1()}
+                styleSettings={props.styleSettings}
             />
             <Button
-                onClick={() => props.onClick2()}
                 name={props.buttonName2}
+                onClick={() => props.onClick2()}
+                styleSettings={props.styleSettings}
             />
             <br/>
         </div>
@@ -383,6 +386,8 @@ export default class Train extends React.Component {
     }
 
     render() {
+        const sizes = this.state.sizes;
+        const style = this.props.styleSettings;
         const times = this.state.times;
         const nSelected = this.state.selected.length;
         
@@ -403,7 +408,7 @@ export default class Train extends React.Component {
         if (!isEmpty(times) && lastCase !== -1) {
             let button = "";
             if (this.state.selected.includes(lastCase))
-                button = <Button onClick={() => this.confirmUnsel(lastCase)} name='Unselect'/>;
+                button = <Button name='Unselect' onClick={() => this.confirmUnsel(lastCase)} styleSettings={style}/>;
             lastScramInfo = (
                 <div>
                     Last Scramble: {this.state.lastEntry.scramble + ' (' + algsInfo[lastCase]['name'] + ')'}
@@ -414,15 +419,15 @@ export default class Train extends React.Component {
 
         const hintBox = this.renderHintBox();
 
-        let sizes = this.state.sizes;
         return (
             <div className='train'>
             <table id='mainTable'><tbody>
                 <tr><td colSpan='2'>
                     <Button
+                        name='Select Cases'
                         id='selectBtn'
                         onClick={() => this.props.changeMode('caseselect')}
-                        name='Select Cases'
+                        styleSettings={style}
                     />
                     {selInfo}
                 </td></tr>
@@ -432,8 +437,8 @@ export default class Train extends React.Component {
                         <Timer
                             isActive={nSelected > 0}
                             onTimerEnd={time => this.handleTimerEnd(time)}
-                            regularColor={this.props.styleSettings.textColor}
-                            prepColor={this.props.styleSettings.accentColor}
+                            regularColor={style.textColor}
+                            prepColor={style.accentColor}
                             fontSize={sizes['timer']}
                         />
                     </td>
@@ -443,49 +448,66 @@ export default class Train extends React.Component {
                         confirmClear={() => this.confirmClear()}
                         lastEntry={this.state.lastEntry}
                         displayBox={(i) => this.displayBox(i)}
+                        styleSettings={this.props.styleSettings}
                     />
                 </tr>
                 <tr>
                     <td colSpan="2">
                         <SettingButtons
                             name='Timer Size'
-                            onClick1={() => this.adjustSize('timer', 16)}
-                            onClick2={() => this.adjustSize('timer', -16)}
                             buttonName1='Increase'
                             buttonName2='Decrease'
+                            onClick1={() => this.adjustSize('timer', 16)}
+                            onClick2={() => this.adjustSize('timer', -16)}
+                            styleSettings={this.props.styleSettings}
                         />
                         <SettingButtons
                             name='Scramble Size'
-                            onClick1={() => this.adjustSize('scramble', 8)}
-                            onClick2={() => this.adjustSize('scramble', -8)}
                             buttonName1='Increase'
                             buttonName2='Decrease'
+                            onClick1={() => this.adjustSize('scramble', 8)}
+                            onClick2={() => this.adjustSize('scramble', -8)}
+                            styleSettings={this.props.styleSettings}
                         />
                         <SettingButtons
                             name='Colors'
-                            onClick1={() => this.setStyle('light')}
-                            onClick2={() => this.setStyle('dark')}
                             buttonName1='Light'
                             buttonName2='Dark'
+                            onClick1={() => this.setStyle('light')}
+                            onClick2={() => this.setStyle('dark')}
+                            styleSettings={this.props.styleSettings}
                         />
                         <SettingInput
                             name='Background'
                             propertyName='backgroundColor'
-                            value={this.props.styleSettings.backgroundColor}
+                            value={style.backgroundColor}
+                            applyStyle={(style) => this.props.applyStyle(style)}
+                        />
+                        <SettingInput
+                            name='Button'
+                            propertyName='buttonColor'
+                            value={style.buttonColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
                         />
                         <SettingInput
                             name='Text'
                             propertyName='textColor'
-                            value={this.props.styleSettings.textColor}
+                            value={style.textColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
                         />
                         <SettingInput
                             name='Link'
                             propertyName='linkColor'
-                            value={this.props.styleSettings.linkColor}
+                            value={style.linkColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
                         />
+                        <SettingInput
+                            name='Accent'
+                            propertyName='accentColor'
+                            value={style.accentColor}
+                            applyStyle={(style) => this.props.applyStyle(style)}
+                        />
+
                         {lastScramInfo}
                     </td>
                 </tr>

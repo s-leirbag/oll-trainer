@@ -5,11 +5,8 @@ import { defaultPreset, stylePresets } from '../../StylePresets';
 export default class Button extends React.Component {
     constructor(props) {
         super(props);
-        let defaultStyle = stylePresets[defaultPreset];
         this.state = {
-            backgroundColor: props.regularColor || defaultStyle.buttonColor,
-            regularColor: props.regularColor || defaultStyle.buttonColor,
-            hoverColor: props.hoverColor || defaultStyle.accentColor,
+            backgroundColor: props.styleSettings.buttonColor,
         };
     }
 
@@ -20,11 +17,11 @@ export default class Button extends React.Component {
     }
 
     handleOnMouseEnter() {
-        this.setState({ backgroundColor: this.state.hoverColor });
+        this.setState({ backgroundColor: this.props.styleSettings.accentColor });
     }
 
     handleOnMouseLeave() {
-        this.setState({ backgroundColor: this.state.regularColor });
+        this.setState({ backgroundColor: this.props.styleSettings.buttonColor });
     }
 
     render() {
@@ -36,7 +33,7 @@ export default class Button extends React.Component {
                 title={this.props.title || this.props.name}
                 style={{
                     backgroundColor: this.state.backgroundColor,
-                    color: 'white'
+                    color: this.props.styleSettings.textColor,
                 }}
             >
                 {this.props.name}
