@@ -1,6 +1,8 @@
 import React from 'react';
 import "./Train.css";
+import Button from "../Button/Button.jsx";
 import Timer from "../Timer/Timer.jsx";
+import { stylePresets } from '../../StylePresets';
 import { algsInfo, ollMap } from '../../Constants';
 import { msToReadable, logTabSep } from '../../Utils';
 import { clone, cloneDeep, sample, isEmpty, sortBy } from 'lodash';
@@ -107,7 +109,7 @@ class Stats extends React.Component {
             <td id="stats">
                 <div className="resultInfoHeader">
                     {this.props.times.length} times
-                    <button onClick={() => this.props.confirmClear()}>Clear</button>
+                    <Button onClick={() => this.props.confirmClear()} name='Clear'/>
                     :
                 </div>
                 <div id="times">
@@ -122,8 +124,14 @@ function SettingButtons(props) {
     return (
         <div>
             {props.name}
-            <button onClick={() => props.onClick1()}>{props.buttonName1}</button>
-            <button onClick={() => props.onClick2()}>{props.buttonName2}</button>
+            <Button
+                onClick={() => props.onClick1()}
+                name={props.buttonName1}
+            />
+            <Button
+                onClick={() => props.onClick2()}
+                name={props.buttonName2}
+            />
             <br/>
         </div>
     );
@@ -149,7 +157,6 @@ class SettingInput extends React.Component {
                     type="text"
                     value={this.state.value}
                     onChange={(event) => this.handleChange(event)}
-                    placeholder={this.props.default}
                     maxLength='12'
                 />
             </label>
@@ -168,7 +175,6 @@ export default class Train extends React.Component {
             currentEntry: props.currentEntry,
             lastEntry: props.lastEntry,
             caseDisplayed: -1,
-            // textcolor_in: props.textcolor_in
         };
     }
 
@@ -339,6 +345,18 @@ export default class Train extends React.Component {
         }
     }
 
+    adjustSize(element, increment) {
+        console.log('adjust ' + element + ' size by ' + increment);
+    }
+
+    setStyle(preset) {
+        if (preset === "dark") {
+            let style = stylePresets[preset];
+            this.props.applyStyle(style);
+        }
+        // this.props.applyStyle(stylePresets[preset]);
+    }
+
     displayBox(i) {
         this.setState({ caseDisplayed: i });
     }
@@ -382,7 +400,7 @@ export default class Train extends React.Component {
         if (!isEmpty(times) && lastCase !== -1) {
             let button = "";
             if (this.state.selected.includes(lastCase))
-                button = <button onClick={() => this.confirmUnsel(lastCase)}>Unselect</button>;
+                button = <Button onClick={() => this.confirmUnsel(lastCase)} name='Unselect'/>;
             lastScramInfo = (
                 <div>
                     Last Scramble: {this.state.lastEntry.scramble + ' (' + algsInfo[lastCase]['name'] + ')'}
@@ -397,12 +415,11 @@ export default class Train extends React.Component {
             <div className='train'>
             <table id='mainTable'><tbody>
                 <tr><td colSpan='2'>
-                    <button
+                    <Button
                         id='selectBtn'
                         onClick={() => this.props.changeMode('caseselect')}
-                    >
-                        Select Cases
-                    </button>
+                        name='Select Cases'
+                    />
                     {selInfo}
                 </td></tr>
                 <tr><td id="scramble" colSpan="2">{scramInfo}</td></tr>
@@ -411,7 +428,7 @@ export default class Train extends React.Component {
                         <Timer
                             isActive={nSelected > 0}
                             onTimerEnd={time => this.handleTimerEnd(time)}
-                            color={this.props.textcolor_in}
+                            color={this.props.styleSettings.textColor}
                         />
                     </td>
                     <Stats
@@ -440,33 +457,27 @@ export default class Train extends React.Component {
                         />
                         <SettingButtons
                             name='Colors'
-                            onClick1={() => this.setStyle('light', 8)}
-                            onClick2={() => this.setStyle('dark', -8)}
+                            onClick1={() => this.setStyle('light')}
+                            onClick2={() => this.setStyle('dark')}
                             buttonName1='Light'
                             buttonName2='Dark'
                         />
                         <SettingInput
                             name='Background'
-                            propertyName='bgcolor_in'
-                            value={this.props.bgcolor_in}
-                            default='#f5f5f5'
-                            id='bgcolor_in'
+                            propertyName='backgroundColor'
+                            value={this.props.styleSettings.backgroundColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
                         />
                         <SettingInput
                             name='Text'
-                            propertyName='textcolor_in'
-                            value={this.props.textcolor_in}
-                            default='#000000'
-                            id='textcolor_in'
+                            propertyName='textColor'
+                            value={this.props.styleSettings.textColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
                         />
                         <SettingInput
                             name='Link'
-                            propertyName='linkscolor_in'
-                            value={this.props.linkscolor_in}
-                            default='#004411'
-                            id='linkscolor_in'
+                            propertyName='linkColor'
+                            value={this.props.styleSettings.linkColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
                         />
                         {lastScramInfo}

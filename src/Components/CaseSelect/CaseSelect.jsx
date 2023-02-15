@@ -1,5 +1,6 @@
 import React from 'react';
 import "./CaseSelect.css";
+import Button from "../Button/Button.jsx";
 import { algsGroups, renderGroups, algsInfo } from '../../Constants';
 
 function Case(props) {
@@ -8,7 +9,7 @@ function Case(props) {
             className="case"
             onClick={() => props.onClick()}
             title={props.name}
-            style={{ background: props.background }}
+            style={{ backgroundColor: props.backgroundColor }}
         >
             <img width='100px' src={props.src} alt={props.name}/>
         </td>
@@ -68,14 +69,16 @@ export default class CaseSelect extends React.Component {
     }
 
     renderCase(i) {
-        const bgColor = this.state.selected.includes(i) ? 'yellow' : this.props.bgcolor_in;
+        let style = this.props.styleSettings;
+        // const backgroundColor = this.state.selected.includes(i) ? 'yellow' : style.backgroundColor;
+        const backgroundColor = this.state.selected.includes(i) ? style.accentColor : style.backgroundColor;
         
         return (
             <Case
                 key={i}
                 onClick={() => this.toggleCase(i)}
                 name={algsInfo[i]["name"]}
-                background={bgColor}
+                backgroundColor={backgroundColor}
                 src={"pic/" + i + ".svg"}
             />
         );
@@ -145,8 +148,9 @@ export default class CaseSelect extends React.Component {
             <div>
                 <h1>OLL Trainer</h1>
                 <p>
-                    Click on pictures and group headers to select/deselect cases
-                    <br/>GitHub repo: <a href='https://github.com/s-leirbag/oll-trainer'>click</a>, download offline version: <a href='https://github.com/s-leirbag/oll-trainer/archive/refs/heads/main.zip'>zip</a>
+                    Click on pictures and group headers to select cases
+                    <br/>GitHub repo: <a href='https://github.com/s-leirbag/oll-trainer'>click</a>
+                    <br/>Offline version: <a href='https://github.com/s-leirbag/oll-trainer/archive/refs/heads/main.zip'>zip</a>
                 </p>
             </div>
             <table><tbody>
@@ -155,18 +159,16 @@ export default class CaseSelect extends React.Component {
             </tbody></table>
             <div className="btns-right">
                 <h1>Train</h1>
-                <button
+                <Button
                     onClick={() => this.props.changeMode('random')}
                     title='Train selected cases randomly'
-                >
-                    Random
-                </button>
-                <button
+                    name='Random'
+                />
+                <Button
                     onClick={() => this.props.changeMode('recap')}
                     title='Go through all the selected cases once'
-                >
-                    Recap
-                </button>
+                    name='Recap'
+                />
             </div>
             </div>
         );

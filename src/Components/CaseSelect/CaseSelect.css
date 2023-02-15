@@ -34,14 +34,9 @@ td {border: 1px solid #000;}
 /* done button that appends ">" on hover */
 button {
     float: right;
-    display: inline-block; border-radius: 2px; background-color: #95a5a6; border: none; color: #FFFFFF; text-align: center; font-size: 28px; padding: 10px; transition: all 0.3s; cursor: pointer; margin: 5px;}
+    display: inline-block; border-radius: 2px; border: none; text-align: center; font-size: 28px; padding: 10px; transition: all 0.3s; cursor: pointer; margin: 5px;}
 button span { cursor: pointer; display: inline-block; position: relative; transition: 0.3s;}
 button span:after {content: '»'; position: absolute; opacity: 0; top: 0; right: -20px; transition: 0.3s;}
 button:hover span { padding-right: 25px;}
-button:hover {background-color: #74898b;}
+button:hover {}
 button:hover span:after {opacity: 1; right: 0;}
-
-/* blue button change color on hover */
-/* .dbutton {
-  display: inline-block; border-radius: 2px; background-color: #95a5a6; border: none; color: #FFFFFF; text-align: center; font-size: 18px; padding: 10px; transition: all 0.3s; cursor: pointer; margin: 5px;}
-.dbutton:hover {background-color: #74898b;}	 */

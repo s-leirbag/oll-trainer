@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import { defaultPreset, stylePresets } from './StylePresets.js';
 import CaseSelect from './Components/CaseSelect/CaseSelect.jsx';
 import Train from './Components/Train/Train.jsx';
 import { logTabSep } from './Utils';
@@ -44,9 +45,7 @@ export default class App extends React.Component {
         currentEntry: {},
         recapArray: [],
         selChanged: false,
-        bgcolor_in: '#f5f5f5',
-        textcolor_in: '#000000',
-        linkscolor_in: '#004411'
+        style: stylePresets[defaultPreset],
     };
   }
 
@@ -112,43 +111,68 @@ export default class App extends React.Component {
     this.saveSelection(selected);
   }
 
-  applyStyle(style) {
-    this.saveStyle(style);
-  }
+  saveStyle(newStyle) {
+    let style = this.state.style;
 
-  saveStyle(style) {
-    if (style.hasOwnProperty('bgcolor_in')) {
-      this.setState({ bgcolor_in: style.bgcolor_in });
-      saveLocal('bgcolor_in', JSON.stringify(style.bgcolor_in));
+    if (newStyle.hasOwnProperty('backgroundColor')) {
+      style.backgroundColor = newStyle.backgroundColor;
+      // saveLocal('backgroundColor', JSON.stringify(style.backgroundColor));
     }
-    if (style.hasOwnProperty('textcolor_in')) {
-      this.setState({ textcolor_in: style.textcolor_in });
-      saveLocal('textcolor_in', JSON.stringify(style.textcolor_in));
+    if (newStyle.hasOwnProperty('buttonColor')) {
+      style.buttonColor = newStyle.buttonColor;
+      // saveLocal('buttonColor', JSON.stringify(style.buttonColor));
     }
-    if (style.hasOwnProperty('linkscolor_in')) {
-      this.setState({ linkscolor_in: style.linkscolor_in });
-      saveLocal('linkscolor_in', JSON.stringify(style.linkscolor_in));
+    if (newStyle.hasOwnProperty('textColor')) {
+      style.textColor = newStyle.textColor;
+      // saveLocal('textColor', JSON.stringify(style.textColor));
     }
+    if (newStyle.hasOwnProperty('linkColor')) {
+      style.linkColor = newStyle.linkColor;
+      // saveLocal('linkColor', JSON.stringify(style.linkColor));
+    }
+    if (newStyle.hasOwnProperty('accentColor')) {
+      style.accentColor = newStyle.accentColor;
+      // saveLocal('accentColor', JSON.stringify(style.accentColor));
+    }
+
+    this.setState({ style: style })
+    saveLocal('style', JSON.stringify(style));
   }
 
   loadStyle() {
-    let bgcolor_in = JSON.parse(loadLocal('bgcolor_in', ''));
-    if (bgcolor_in == null)
-      bgcolor_in = '';
-    
-    let textcolor_in = JSON.parse(loadLocal('textcolor_in', ''));
-    if (textcolor_in == null)
-      textcolor_in = '';
-    
-    let linkscolor_in = JSON.parse(loadLocal('linkscolor_in', ''));
-    if (linkscolor_in == null)
-      linkscolor_in = '';
+    let style = JSON.parse(loadLocal('style', ''));
+    if (style == null)
+      this.saveStyle('dark');
 
-    this.saveStyle({
-      bgcolor_in: bgcolor_in, 
-      textcolor_in: textcolor_in,
-      linkscolor_in: linkscolor_in
-    });
+    this.setState({ style: style });
+
+    // let backgroundColor = JSON.parse(loadLocal('backgroundColor', ''));
+    // if (backgroundColor == null)
+    //   backgroundColor = '';
+
+    // let buttonColor = JSON.parse(loadLocal('buttonColor', ''));
+    // if (buttonColor == null)
+    // buttonColor = '';
+    
+    // let textColor = JSON.parse(loadLocal('textColor', ''));
+    // if (textColor == null)
+    //   textColor = '';
+    
+    // let linkColor = JSON.parse(loadLocal('linkColor', ''));
+    // if (linkColor == null)
+    //   linkColor = '';
+    
+    // let accentColor = JSON.parse(loadLocal('accentColor', ''));
+    // if (accentColor == null)
+    //   accentColor = '';
+
+    // this.saveStyle({
+    //   backgroundColor: backgroundColor,
+    //   buttonColor,
+    //   textColor: textColor,
+    //   linkColor: linkColor,
+    //   accentColor: accentColor,
+    // });
   }
 
   changeMode(mode) {
@@ -169,7 +193,7 @@ export default class App extends React.Component {
           selected={this.state.selected}
           saveSelection={(selected) => this.saveSelection(selected)}
           changeMode={(mode) => this.changeMode(mode)}
-          bgcolor_in={this.state.bgcolor_in}
+          styleSettings={this.state.style}
         />
       );
     // random or recap
@@ -185,20 +209,19 @@ export default class App extends React.Component {
           lastEntry={this.state.lastEntry}
           currentEntry={this.state.currentEntry}
           recapArray={this.state.recapArray}
-          applyStyle={(style) => this.applyStyle(style)}
-          // saveStyle={(style) => this.saveStyle(style)}
-          bgcolor_in={this.state.bgcolor_in}
-          textcolor_in={this.state.textcolor_in}
-          linkscolor_in={this.state.linkscolor_in}
+          applyStyle={(style) => this.saveStyle(style)}
+          styleSettings={this.state.style}
         />
       );
     }
 
+    let style = this.state.style;
+
     return (
       <div className="App"
         style={{
-          backgroundColor: this.state.bgcolor_in,
-          color: this.state.textcolor_in
+          backgroundColor: style.backgroundColor,
+          color: style.textColor,
         }}
       >
         {app}
