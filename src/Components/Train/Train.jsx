@@ -88,7 +88,6 @@ class Stats extends React.Component {
     }
 
     render() {
-        // console.log("stats " + this.props.styleSettings);
         const resultsByCase = this.getResultsByCase(this.props.times);
         const keys = sortBy(Object.keys(resultsByCase).map(Number));
 
@@ -448,7 +447,7 @@ export default class Train extends React.Component {
                         confirmClear={() => this.confirmClear()}
                         lastEntry={this.state.lastEntry}
                         displayBox={(i) => this.displayBox(i)}
-                        styleSettings={this.props.styleSettings}
+                        styleSettings={style}
                     />
                 </tr>
                 <tr>
@@ -459,7 +458,7 @@ export default class Train extends React.Component {
                             buttonName2='Decrease'
                             onClick1={() => this.adjustSize('timer', 16)}
                             onClick2={() => this.adjustSize('timer', -16)}
-                            styleSettings={this.props.styleSettings}
+                            styleSettings={style}
                         />
                         <SettingButtons
                             name='Scramble Size'
@@ -467,7 +466,7 @@ export default class Train extends React.Component {
                             buttonName2='Decrease'
                             onClick1={() => this.adjustSize('scramble', 8)}
                             onClick2={() => this.adjustSize('scramble', -8)}
-                            styleSettings={this.props.styleSettings}
+                            styleSettings={style}
                         />
                         <SettingButtons
                             name='Colors'
@@ -475,37 +474,44 @@ export default class Train extends React.Component {
                             buttonName2='Dark'
                             onClick1={() => this.setStyle('light')}
                             onClick2={() => this.setStyle('dark')}
-                            styleSettings={this.props.styleSettings}
+                            styleSettings={style}
                         />
                         <SettingInput
                             name='Background'
                             propertyName='backgroundColor'
                             value={style.backgroundColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
+                            // Key to create a new input component when the value changes
+                            // https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key
+                            key={style.backgroundColor}
                         />
                         <SettingInput
                             name='Button'
                             propertyName='buttonColor'
                             value={style.buttonColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
+                            key={style.buttonColor}
                         />
                         <SettingInput
                             name='Text'
                             propertyName='textColor'
                             value={style.textColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
+                            key={style.textColor}
                         />
                         <SettingInput
                             name='Link'
                             propertyName='linkColor'
                             value={style.linkColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
+                            key={style.linkColor}
                         />
                         <SettingInput
                             name='Accent'
                             propertyName='accentColor'
                             value={style.accentColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
+                            key={style.accentColor}
                         />
 
                         {lastScramInfo}

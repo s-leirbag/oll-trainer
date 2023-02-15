@@ -128,6 +128,7 @@ export default class CaseSelect extends React.Component {
     }
 
     render() {
+        let style = this.props.styleSettings;
         const topHeader = (
             <tr><GroupHeader
                 key='allHeader'
@@ -149,8 +150,8 @@ export default class CaseSelect extends React.Component {
                 <h1>OLL Trainer</h1>
                 <p>
                     Click on pictures and group headers to select cases
-                    <br/>GitHub repo: <a href='https://github.com/s-leirbag/oll-trainer'>click</a>
-                    <br/>Offline version: <a href='https://github.com/s-leirbag/oll-trainer/archive/refs/heads/main.zip'>zip</a>
+                    <br/>GitHub repo: <a href='https://github.com/s-leirbag/oll-trainer' style={{ color: style.linkColor }}>click</a>
+                    <br/>Offline version: <a href='https://github.com/s-leirbag/oll-trainer/archive/refs/heads/main.zip' style={{ color: style.linkColor }}>zip</a>
                 </p>
             </div>
             <table><tbody>
@@ -163,13 +164,13 @@ export default class CaseSelect extends React.Component {
                     name='Random'
                     onClick={() => this.props.changeMode('random')}
                     title='Train selected cases randomly'
-                    styleSettings={this.props.styleSettings}
+                    styleSettings={style}
                 />
                 <Button
                     name='Recap'
                     onClick={() => this.props.changeMode('recap')}
                     title='Go through all the selected cases once'
-                    styleSettings={this.props.styleSettings}
+                    styleSettings={style}
                 />
             </div>
             </div>
