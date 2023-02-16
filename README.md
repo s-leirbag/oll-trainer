@@ -12,6 +12,7 @@ It's a near copy of https://github.com/Roman-/oll_trainer by Roman Strakhov but 
   - Accent color/other color customization
   - Add color customization input fields to both pages
   - Note: colors are (main text, background, links, timer, stickers, highlight case, button/hover)
+  - Make button keys not jank—currently set to button color of style so component re-renders when button color changes
 - Refactor/make code readable ;((((
   - Turn training elements into components not just functions
 - Improve layout

@@ -2,6 +2,7 @@ import React from 'react';
 import "./CaseSelect.css";
 import Button from "../Button/Button.jsx";
 import { algsGroups, renderGroups, algsInfo } from '../../Constants';
+import { clone } from 'lodash';
 
 function Case(props) {
     return (
@@ -144,12 +145,23 @@ export default class CaseSelect extends React.Component {
         for (const group of renderGroups["normal"])
             cases = cases.concat(this.renderNormalGroup(group));
 
+        let trainButtonStyle = clone(style);
+        trainButtonStyle.float = 'left';
         return (
             <div className="caseselect">
-            <div>
+            <div className='case-select-header'>
                 <h1>OLL Trainer</h1>
                 <p>
-                    Click on pictures and group headers to select cases
+                    Welcome to the OLL trainer!
+                    OLL is a step in the CFOP speedcubing method
+                    (<a href='https://jperm.net/3x3/cfop' style={{ color: style.linkColor }}>CFOP</a>)
+                    where you orient the last layer of pieces.
+                    <br/>
+                    <br/>There are 57 different OLL cases. Select/deselect them on the left by clicking the images.
+                    <br/>You can select/deselect all cases/cases in different groups by clicking the headers.
+                    <br/>
+                    <br/>Click the training buttons on the right to go into training mode!
+                    <br/>
                     <br/>GitHub repo: <a href='https://github.com/s-leirbag/oll-trainer' style={{ color: style.linkColor }}>click</a>
                     <br/>Offline version: <a href='https://github.com/s-leirbag/oll-trainer/archive/refs/heads/main.zip' style={{ color: style.linkColor }}>zip</a>
                 </p>
@@ -158,20 +170,26 @@ export default class CaseSelect extends React.Component {
                 {topHeader}
                 {cases}
             </tbody></table>
-            <div className="btns-right">
+            <div className="train-buttons">
                 <h1>Train</h1>
                 <Button
-                    name='Random'
+                    name='Random mode'
                     onClick={() => this.props.changeMode('random')}
                     title='Train selected cases randomly'
-                    styleSettings={style}
+                    styleSettings={trainButtonStyle}
                 />
+                <p>
+                    Gives you random cases from your selection.
+                </p>
                 <Button
-                    name='Recap'
+                    name='Recap mode'
                     onClick={() => this.props.changeMode('recap')}
                     title='Go through all the selected cases once'
-                    styleSettings={style}
+                    styleSettings={trainButtonStyle}
                 />
+                <p>
+                    Goes through all the selected cases once.
+                </p>
             </div>
             </div>
         );

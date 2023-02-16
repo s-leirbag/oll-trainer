@@ -77,12 +77,12 @@ export default class Timer extends React.Component {
         return (
             <div
                 className="timer"
-                style={{
-                    color: color,
-                    fontSize: this.props.fontSize,
-                }}
+                style={{ fontSize: this.props.fontSize }}
             >
-                {msToReadable(time)}
+                <div className='timerContents'>
+                    <span style={{ color: color }}>{msToReadable(time)}</span>
+                    <p style={{ fontSize: '16px' }}>Press space to start/stop the timer</p>
+                </div>
             </div>
         )
     }

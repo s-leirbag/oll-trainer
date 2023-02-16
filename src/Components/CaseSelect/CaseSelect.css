@@ -6,6 +6,11 @@
     height: 100vh; */
     /* justify-content: center; */
     /* align-items: center; */
+    text-align: left;
+}
+
+.case-select-header {
+    margin-left: 10px;
 }
 
 #sl {white-space: nowrap;}
@@ -24,11 +29,10 @@ td.groupHeader {
 
 td {border: 1px solid #000;}
 
-.btns-right {
+.train-buttons {
     position: fixed;
     right: 2px;
     top: 2px;
-    /* font-size: 30px; */
 }
 
 /* done button that appends ">" on hover */

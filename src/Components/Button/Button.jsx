@@ -27,6 +27,7 @@ export default class Button extends React.Component {
                 style={{
                     backgroundColor: this.state.backgroundColor,
                     color: this.props.styleSettings.textColor,
+                    float: this.props.styleSettings.float || 'none',
                 }}
             >
                 {this.props.name}

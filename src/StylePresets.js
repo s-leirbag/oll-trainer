@@ -4,7 +4,7 @@ export const stylePresets = {
     dark: {
         backgroundColor: "#313637",
         // backgroundColor2: "#636e72",
-        buttonColor: "#b2bec3",
+        buttonColor: "#636e72",
         textColor: "#dfe6e9",
         linkColor: "#74b9ff",
         accentColor: "#fdcb6e",

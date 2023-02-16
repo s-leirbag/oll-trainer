@@ -67,7 +67,7 @@ function TimesGroup(props) {
                 >
                     {name}
                 </span>
-                : {avg}
+                : {avg} average
             </div>
             {timesList}
             <br/><br/>
@@ -105,12 +105,17 @@ class Stats extends React.Component {
             );
         }
 
+        const style = this.props.styleSettings;
         return (
             <td id="stats">
                 <div className="resultInfoHeader">
                     {this.props.times.length} times
-                    <Button name='Clear' onClick={() => this.props.confirmClear()} styleSettings={this.props.styleSettings}/>
+                    <Button name='Clear' onClick={() => this.props.confirmClear()} styleSettings={style} key={style.buttonColor}/>
                     :
+                </div>
+                <div>
+                    Click case names for case info
+                    <br/>Click times to remove times
                 </div>
                 <div id="times">
                     {groupsList}
@@ -159,7 +164,8 @@ class SettingInput extends React.Component {
                     type="text"
                     value={this.state.value}
                     onChange={(event) => this.handleChange(event)}
-                    maxLength='12'
+                    maxLength='7'
+                    size='7'
                 />
             </label>
         );
@@ -408,7 +414,7 @@ export default class Train extends React.Component {
         if (!isEmpty(times) && lastCase !== -1) {
             let button = "";
             if (this.state.selected.includes(lastCase))
-                button = <Button name='Unselect' onClick={() => this.confirmUnsel(lastCase)} styleSettings={style}/>;
+                button = <Button name='Unselect' onClick={() => this.confirmUnsel(lastCase)} styleSettings={style} key={style.buttonColor}/>;
             lastScramInfo = (
                 <div>
                     Last Scramble: {this.state.lastEntry.scramble + ' (' + algsInfo[lastCase]['name'] + ')'}
@@ -428,6 +434,7 @@ export default class Train extends React.Component {
                         id='selectBtn'
                         onClick={() => this.props.changeMode('caseselect')}
                         styleSettings={style}
+                        key={style.buttonColor}
                     />
                     {selInfo}
                 </td></tr>
@@ -455,30 +462,34 @@ export default class Train extends React.Component {
                     <td colSpan="2">
                         <SettingButtons
                             name='Timer Size'
-                            buttonName1='Increase'
-                            buttonName2='Decrease'
+                            buttonName1='+'
+                            buttonName2='-'
                             onClick1={() => this.adjustSize('timer', 16)}
                             onClick2={() => this.adjustSize('timer', -16)}
                             styleSettings={style}
+                            key={'timer' + style.buttonColor}
                         />
                         <SettingButtons
                             name='Scramble Size'
-                            buttonName1='Increase'
-                            buttonName2='Decrease'
+                            buttonName1='+'
+                            buttonName2='-'
                             onClick1={() => this.adjustSize('scramble', 8)}
                             onClick2={() => this.adjustSize('scramble', -8)}
                             styleSettings={style}
+                            key={'scramble' + style.buttonColor}
                         />
                         <SettingButtons
-                            name='Colors'
+                            name='Color Presets'
                             buttonName1='Light'
                             buttonName2='Dark'
                             onClick1={() => this.setStyle('light')}
                             onClick2={() => this.setStyle('dark')}
                             styleSettings={style}
+                            key={'presets' + style.buttonColor}
                         />
+                        <span>Specific Colors: </span>
                         <SettingInput
-                            name='Background'
+                            name='Background: '
                             propertyName='backgroundColor'
                             value={style.backgroundColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
@@ -487,28 +498,28 @@ export default class Train extends React.Component {
                             key={style.backgroundColor}
                         />
                         <SettingInput
-                            name='Button'
+                            name=' Button: '
                             propertyName='buttonColor'
                             value={style.buttonColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
                             key={style.buttonColor}
                         />
                         <SettingInput
-                            name='Text'
+                            name=' Text: '
                             propertyName='textColor'
                             value={style.textColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
                             key={style.textColor}
                         />
-                        <SettingInput
+                        {/* <SettingInput
                             name='Link'
                             propertyName='linkColor'
                             value={style.linkColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
                             key={style.linkColor}
-                        />
+                        /> */}
                         <SettingInput
-                            name='Accent'
+                            name=' Accent: '
                             propertyName='accentColor'
                             value={style.accentColor}
                             applyStyle={(style) => this.props.applyStyle(style)}
