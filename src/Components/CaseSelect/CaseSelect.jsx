@@ -153,9 +153,9 @@ export default class CaseSelect extends React.Component {
                 <h1>OLL Trainer</h1>
                 <p>
                     Welcome to the OLL trainer!
-                    OLL is a step in the CFOP speedcubing method
-                    (<a href='https://jperm.net/3x3/cfop' style={{ color: style.linkColor }}>CFOP</a>)
-                    where you orient the last layer of pieces.
+                    <br/>OLL is a step in the CFOP speedcubing method 
+                    (<a href='https://jperm.net/3x3/cfop' style={{ color: style.linkColor }}>CFOP</a>).
+                    <br/>In OLL, you orient the last layer of pieces.
                     <br/>
                     <br/>There are 57 different OLL cases. Select/deselect them on the left by clicking the images.
                     <br/>You can select/deselect all cases/cases in different groups by clicking the headers.

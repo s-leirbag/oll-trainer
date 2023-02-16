@@ -8,7 +8,11 @@ function EggHints(props) {
         <div>
             <table id="eggWindow" style={{backgroundColor: props.styleSettings.backgroundColor}}><tbody>
                 <tr>
-                    <td rowSpan='2' style={{backgroundColor: props.styleSettings.accentColor}}>
+                    <td
+                        rowSpan='2'
+                        style={{backgroundColor: props.styleSettings.accentColor}}
+                        onClick={props.onEggClick}
+                    >
                         <img id='eggImg' src={props.img} alt='egg'/>
                     </td>
                     <td id='eggTitle'><h1>Easter Eggs</h1></td>
@@ -59,11 +63,15 @@ export default class Egg extends React.Component {
     }
 
     handleOnClick() {
+        this.setEggHintVisibility(true);
+        this.onEggClick();
+    }
+
+    onEggClick() {
         if (this.state.crackLevel === 2) {
-            alert('You killed Mr. Egg...')
+            // alert('You killed Mr. Egg...');
             return;
         }
-        this.setEggHintVisibility(true);
 
         const clickTime = (new Date()).getTime();
         let clickTimes = clone(this.state.clickTimes);
@@ -109,6 +117,7 @@ export default class Egg extends React.Component {
                     hide={() => this.setEggHintVisibility(false)} 
                     styleSettings={this.props.styleSettings}
                     img={this.state.img}
+                    onEggClick={() => this.onEggClick()}
                 />
             );
         }
@@ -120,7 +129,7 @@ export default class Egg extends React.Component {
         return (
             <div id="egg">
                 <Button
-                    name={<img width='100px' src={this.state.img} alt='egg'/>}
+                    name={<img width='100px' src={IMAGE_INDEX[this.state.crackLevel]} alt='egg'/>}
                     onClick={() => this.handleOnClick()}
                     title='easter egg'
                     styleSettings={this.props.styleSettings}

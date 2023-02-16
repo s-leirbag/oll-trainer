@@ -144,33 +144,21 @@ function SettingButtons(props) {
     );
 }
 
-class SettingInput extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {value: this.props.value};
-    }
-
-    handleChange(event) {
-        this.setState({value: event.target.value});
-        this.props.applyStyle({ [this.props.propertyName]: event.target.value });
-    }
-
-    render() {
-        return (
-            <label>
-                {this.props.name}
-                <input
-                    className='settinginput'
-                    type="text"
-                    value={this.state.value}
-                    onChange={(event) => this.handleChange(event)}
-                    maxLength='7'
-                    size='7'
-                />
-            </label>
-        );
-    }
-  }
+function SettingInput(props) {
+    return (
+        <label>
+            {props.name}
+            <input
+                className='settinginput'
+                type="text"
+                value={props.value}
+                onChange={props.onChange}
+                maxLength='7'
+                size='7'
+            />
+        </label>
+    );
+}
 
 export default class Train extends React.Component {
     constructor(props) {
@@ -186,7 +174,8 @@ export default class Train extends React.Component {
             sizes: {
                 'timer': 90,
                 'scramble': 20,
-            }
+            },
+            styleSettings: props.styleSettings,
         };
     }
 
@@ -357,6 +346,29 @@ export default class Train extends React.Component {
         }
     }
 
+    applyStyle(newStyle) {
+        let style = this.state.styleSettings;
+
+        if (newStyle.hasOwnProperty('backgroundColor'))
+            style.backgroundColor = newStyle.backgroundColor;
+        if (newStyle.hasOwnProperty('buttonColor'))
+            style.buttonColor = newStyle.buttonColor;
+        if (newStyle.hasOwnProperty('textColor'))
+            style.textColor = newStyle.textColor;
+        if (newStyle.hasOwnProperty('linkColor'))
+            style.linkColor = newStyle.linkColor;
+        if (newStyle.hasOwnProperty('accentColor'))
+            style.accentColor = newStyle.accentColor;
+
+        this.setState({ styleSettings: style })
+        this.props.applyStyle(style);
+    }
+
+    // https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-controlled-component
+    handleColorInputChange = (propertyName, event) => {
+        this.applyStyle({ [propertyName]: event.target.value });
+    };
+
     adjustSize(element, increment) {
         let sizes = this.state.sizes;
         sizes[element] += increment;
@@ -365,7 +377,7 @@ export default class Train extends React.Component {
 
     setStyle(preset) {
         const style = stylePresets[preset];
-        this.props.applyStyle(style);
+        this.applyStyle(style);
     }
 
     displayBox(i) {
@@ -384,7 +396,7 @@ export default class Train extends React.Component {
                     i={this.state.caseDisplayed}
                     inverseScramble={(s) => this.inverseScramble(s)}
                     hideBox={() => this.hideBox()}
-                    styleSettings={this.props.styleSettings}
+                    styleSettings={this.state.styleSettings}
                 />
             );
         }
@@ -393,7 +405,7 @@ export default class Train extends React.Component {
 
     render() {
         const sizes = this.state.sizes;
-        const style = this.props.styleSettings;
+        const style = this.state.styleSettings;
         const times = this.state.times;
         const nSelected = this.state.selected.length;
         
@@ -490,40 +502,28 @@ export default class Train extends React.Component {
                         <span>Specific Colors: </span>
                         <SettingInput
                             name='Background: '
-                            propertyName='backgroundColor'
                             value={style.backgroundColor}
-                            applyStyle={(style) => this.props.applyStyle(style)}
-                            // Key to create a new input component when the value changes
-                            // https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key
-                            key={style.backgroundColor}
+                            onChange={(event) => this.handleColorInputChange('backgroundColor', event)}
                         />
                         <SettingInput
                             name=' Button: '
-                            propertyName='buttonColor'
                             value={style.buttonColor}
-                            applyStyle={(style) => this.props.applyStyle(style)}
-                            key={style.buttonColor}
+                            onChange={(event) => this.handleColorInputChange('buttonColor', event)}
                         />
                         <SettingInput
                             name=' Text: '
-                            propertyName='textColor'
                             value={style.textColor}
-                            applyStyle={(style) => this.props.applyStyle(style)}
-                            key={style.textColor}
+                            onChange={(event) => this.handleColorInputChange('textColor', event)}
                         />
                         {/* <SettingInput
-                            name='Link'
-                            propertyName='linkColor'
+                            name=' Link: '
                             value={style.linkColor}
-                            applyStyle={(style) => this.props.applyStyle(style)}
-                            key={style.linkColor}
+                            onChange={(event) => this.handleColorInputChange('linkColor', style)}
                         /> */}
                         <SettingInput
                             name=' Accent: '
-                            propertyName='accentColor'
                             value={style.accentColor}
-                            applyStyle={(style) => this.props.applyStyle(style)}
-                            key={style.accentColor}
+                            onChange={(event) => this.handleColorInputChange('accentColor', event)}
                         />
 
                         {lastScramInfo}
