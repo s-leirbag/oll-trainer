@@ -2,8 +2,9 @@ import React from 'react';
 import "./Timer.css";
 import { msToReadable } from '../../Utils';
 
-// Timer simplify color codes/stages code
-
+/**
+ * Timer component of training page
+ */
 export default class Timer extends React.Component {
     constructor(props) {
         super(props);
@@ -30,12 +31,14 @@ export default class Timer extends React.Component {
             return;
         
         if (event.key === " ") {
+            // Hit space to prime the timer
             if (this.state.stage === "idle") {
                 this.setState({
                     stage: "prep",
                     time: 0,
                 });
             }
+            // Or to stop it from running
             else if (this.state.stage === "running") {
                 clearInterval(this.state.intervalId);
                 this.setState({
@@ -52,6 +55,7 @@ export default class Timer extends React.Component {
             return;
         
         if (event.key === " ") {
+            // Let go of space after timer is primed/prepped to begin timer
             if (this.state.stage === "prep") {
                 this.setState({
                     stage: "running",
@@ -61,6 +65,7 @@ export default class Timer extends React.Component {
                     }, 10),
                 });
             }
+            // Or put the timer back into the idle stage
             else if (this.state.stage === "ending") {
                 this.setState({
                     stage: "idle",
@@ -72,6 +77,8 @@ export default class Timer extends React.Component {
     render() {
         const time = this.state.time;
         const stage = this.state.stage;
+
+        // Highlight the text color when the timer is primed/prepped
         let color = stage === "prep" ? this.props.prepColor : this.props.regularColor;
         
         return (

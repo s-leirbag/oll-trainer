@@ -15,7 +15,9 @@ export const algsGroups = {
     "Dots" : [1,2,3,4,18,19,17,20],
 };
 
+// Info for rendering on the case selection page
 export const renderGroups = {
+    // Groups to render side by side with 4 cases next to 2 cases
     "42": [
         ["P-Shapes", "T-Shapes"],
         ["Lines", "Squares"],
@@ -23,6 +25,7 @@ export const renderGroups = {
         ["Knight Moves", "W-Shapes"],
         ["Awkward Shapes", "Oriented Corners"]
     ],
+    // Groups to render on their own row, each with a larger number of cases
     "normal": ["L-Shapes", "Lightning Bolts", "Oriented Edges", "Dots"],
 };
 
