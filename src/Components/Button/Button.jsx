@@ -1,6 +1,9 @@
 import React from 'react';
 import "./Button.css";
 
+/**
+ * Button to use across UI
+ */
 export default class Button extends React.Component {
     constructor(props) {
         super(props);
@@ -9,6 +12,9 @@ export default class Button extends React.Component {
         };
     }
 
+    /**
+     * Change color when mouse hovers over
+     */
     handleOnMouseEnter() {
         this.setState({ backgroundColor: this.props.styleSettings.accentColor });
     }
@@ -27,6 +33,7 @@ export default class Button extends React.Component {
                 style={{
                     backgroundColor: this.state.backgroundColor,
                     color: this.props.styleSettings.textColor,
+                    // Can customize button positioning
                     float: this.props.styleSettings.float || 'none',
                 }}
             >

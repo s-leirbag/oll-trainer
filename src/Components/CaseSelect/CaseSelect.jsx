@@ -4,6 +4,9 @@ import Button from "../Button/Button.jsx";
 import { algsGroups, renderGroups, algsInfo } from '../../Constants';
 import { clone } from 'lodash';
 
+/**
+ * Clickable tile of a case
+ */
 function Case(props) {
     return (
         <td
@@ -17,6 +20,9 @@ function Case(props) {
     );
 }
 
+/**
+ * Clickable header of a group of cases (e.g., P shapes, I shapes)
+ */
 function GroupHeader(props) {
     return (
         <td
@@ -29,6 +35,9 @@ function GroupHeader(props) {
     );
 }
 
+/**
+ * Case selection page
+ */
 export default class CaseSelect extends React.Component {
     constructor(props) {
         super(props);
@@ -37,6 +46,10 @@ export default class CaseSelect extends React.Component {
         };
     }
 
+    /**
+     * Add/remove a case to/from the selection list
+     * @param {number} i number of case being toggled
+     */
     toggleCase(i) {
         let selectedCopy = this.state.selected.slice();
         if (this.state.selected.includes(i))
@@ -47,6 +60,11 @@ export default class CaseSelect extends React.Component {
         this.props.saveSelection(selectedCopy);
     }
 
+    /**
+     * Add/remove all cases in a group to/from the selection list
+     * If any case in the group is already selected, unselect the entire group
+     * @param {string} group name of group of cases
+     */
     toggleGroup(group) {
         const cases = algsGroups[group];
         const selectedInGroup = cases.filter(value => this.state.selected.includes(value));
@@ -59,19 +77,28 @@ export default class CaseSelect extends React.Component {
         this.props.saveSelection(newSelected);
     }
 
+    /**
+     * Add/remove all cases to/from the selection list
+     */
     toggleAll() {
         const newSelected = (
             this.state.selected.length > 0 ?
             [] :
+            // Get case numbers for all cases
             Object.keys(algsInfo).map(i => parseInt(i))
         );
         this.setState({selected: newSelected});
         this.props.saveSelection(newSelected);
     }
 
+    /**
+     * @param {number} i number of case to render
+     * @returns Case jsx
+     */
     renderCase(i) {
         const style = this.props.styleSettings;
-        // const backgroundColor = this.state.selected.includes(i) ? 'yellow' : style.backgroundColor;
+        
+        // Highlight case if selected
         const backgroundColor = this.state.selected.includes(i) ? style.accentColor : style.backgroundColor;
         
         return (
@@ -85,6 +112,10 @@ export default class CaseSelect extends React.Component {
         );
     }
 
+    /**
+     * @param {string} group name of group of cases
+     * @returns GroupHeader jsx
+     */
     renderGroupHeader(group) {
         return (
             <GroupHeader
@@ -96,6 +127,11 @@ export default class CaseSelect extends React.Component {
         );
     }
 
+    /**
+     * Render case tiles for a case group
+     * @param {string} group name of group of cases
+     * @returns jsx for case tiles
+     */
     renderGroupCases(group) {
         const cases = algsGroups[group];
         const row = [];
@@ -105,6 +141,11 @@ export default class CaseSelect extends React.Component {
         return row;
     }
 
+    /**
+     * Render group headers and group cases for a group of 4 cases and a group of 2 cases side by side
+     * @param {string[]} pair pair of groups to render side by side
+     * @returns jsx for group headers and their tiles
+     */
     render42Group(pair) {
         const [group1, group2] = [pair[0], pair[1]];
         return [
@@ -117,6 +158,11 @@ export default class CaseSelect extends React.Component {
         ];
     }
 
+    /**
+     * Render a group header and the corresponding cases
+     * @param {string} group name of group to render
+     * @returns jsx for group headers and their tiles
+     */
     renderNormalGroup(group) {
         return [
             <tr key={group + "headerRow"}>
@@ -128,8 +174,13 @@ export default class CaseSelect extends React.Component {
         ];
     }
 
+    /**
+     * Render the case selection page
+     */
     render() {
         const style = this.props.styleSettings;
+
+        // Header for all cases
         const topHeader = (
             <tr><GroupHeader
                 key='allHeader'
@@ -139,16 +190,22 @@ export default class CaseSelect extends React.Component {
             /></tr>
         );
 
+        // Render case headers and cases
         let cases = [];
         for (const pair of renderGroups["42"]) 
             cases = cases.concat(this.render42Group(pair));
         for (const group of renderGroups["normal"])
             cases = cases.concat(this.renderNormalGroup(group));
 
+        /**
+         * Button style for the buttons that change to the training modes, random/recap
+         */
         let trainButtonStyle = clone(style);
         trainButtonStyle.float = 'left';
+
         return (
             <div className="caseselect">
+            {/* Text info at the top of the page */}
             <div className='case-select-header'>
                 <h1>OLL Trainer</h1>
                 <p>
@@ -169,10 +226,12 @@ export default class CaseSelect extends React.Component {
                     <br/>Offline version: <a href='https://github.com/s-leirbag/oll-trainer/archive/refs/heads/main.zip' style={{ color: style.linkColor }}>zip</a>
                 </p>
             </div>
+            {/* Case headers/tiles */}
             <table><tbody>
                 {topHeader}
                 {cases}
             </tbody></table>
+            {/* Buttons to switch to the training modes: random/recap */}
             <div className="train-buttons">
                 <h1>Train</h1>
                 <Button
