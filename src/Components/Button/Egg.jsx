@@ -19,7 +19,7 @@ function EggHints(props) {
                 </tr>
                 <tr><td>
                     Click Mr. Egg too fast
-                    <br/>Solve very slow/very fast
+                    <br/>Solve very slow/very fast {"(not done yet)"}
                     <br/>Easter Egg 3
                     <br/>Easter Egg 4
                     <br/>Easter Egg 5
@@ -89,9 +89,9 @@ export default class Egg extends React.Component {
             crackLevel += 1;
             img = IMAGE_INDEX[crackLevel];
             if (crackLevel === 1)
-                alert('Ouch!');
+                alert('Ouch! Please don\'t hurt me more...');
             if (crackLevel === 2)
-                alert('OOOOUUCH!');
+                alert('OOOOUUCH! You killed Mr. Egg.');
 
             // Reset click times for next crack level
             clickTimes = [];

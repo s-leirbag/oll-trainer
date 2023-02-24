@@ -1,3 +1,5 @@
+export const styleSettingNames = ['backgroundColor', 'buttonColor', 'textColor', 'linkColor', 'accentColor'];
+
 export const defaultPreset = "light";
 
 export const stylePresets = {

@@ -162,6 +162,9 @@ export default class CaseSelect extends React.Component {
                     <br/>
                     <br/>Click the training buttons on the right to go into training mode!
                     <br/>
+                    <br/>Enjoy!
+                    <br/>Gabriel Shiu
+                    <br/>
                     <br/>GitHub repo: <a href='https://github.com/s-leirbag/oll-trainer' style={{ color: style.linkColor }}>click</a>
                     <br/>Offline version: <a href='https://github.com/s-leirbag/oll-trainer/archive/refs/heads/main.zip' style={{ color: style.linkColor }}>zip</a>
                 </p>

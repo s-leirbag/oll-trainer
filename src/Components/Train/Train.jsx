@@ -2,11 +2,14 @@ import React from 'react';
 import "./Train.css";
 import Button from "../Button/Button.jsx";
 import Timer from "../Timer/Timer.jsx";
-import { stylePresets } from '../../StylePresets';
+import { styleSettingNames, stylePresets } from '../../StylePresets';
 import { algsInfo, ollMap } from '../../Constants';
 import { msToReadable, logTabSep } from '../../Utils';
 import { clone, cloneDeep, sample, isEmpty, sortBy } from 'lodash';
 
+/**
+ * Info box for cases
+ */
 function HintBox(props) {
     const i = props.i;
     const name = algsInfo[i]["name"];
@@ -37,6 +40,10 @@ function HintBox(props) {
     );
 }
 
+/**
+ * Section of stats
+ * Includes case name, average time, and times
+ */
 function TimesGroup(props) {
     let sum = 0;
     let timesList = [];
@@ -75,7 +82,16 @@ function TimesGroup(props) {
     );
 }
 
+/**
+ * Section of stats/times
+ * Sorts list of times by case and makes according TimesGroup components
+ */
 class Stats extends React.Component {
+    /**
+     * Sort list of times by case
+     * @param {Object[]} times 
+     * @returns 
+     */
     getResultsByCase(times) {
         let resultsByCase = {};
         for (const entry of times) {
@@ -125,6 +141,9 @@ class Stats extends React.Component {
     }
 }
 
+/**
+ * A UI setting with its name and two buttons
+ */
 function SettingButtons(props) {
     return (
         <div>
@@ -144,6 +163,9 @@ function SettingButtons(props) {
     );
 }
 
+/**
+ * A UI setting with its name and text input
+ */
 function SettingInput(props) {
     return (
         <label>
@@ -160,22 +182,28 @@ function SettingInput(props) {
     );
 }
 
+/**
+ * Training page
+ */
 export default class Train extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            mode: props.mode, // random, recap
-            selected: props.selected,
-            times: props.times,
-            recapArray: props.recapArray,
-            currentEntry: props.currentEntry,
-            lastEntry: props.lastEntry,
-            caseDisplayed: -1,
+            // Random/recap
+            // Random mode feeds the user random cases from their selection
+            // Recap mode feeds each case once for the user to review
+            mode: props.mode,
+            selected: props.selected, // selected cases in the form of case number
+            times: props.times, // list of time entries
+            recapArray: props.recapArray, // tracks cases left to serve to user in recap mode
+            currentEntry: props.currentEntry, // entry of current case in training, current scramble above the timer
+            lastEntry: props.lastEntry, // entry from last case timed in training
+            caseDisplayed: -1, // current case having its info box displayed, -1 to indicate no case info box shown
             sizes: {
                 'timer': 90,
                 'scramble': 20,
-            },
-            styleSettings: props.styleSettings,
+            }, // UI settings of timer/scramble sizes
+            styleSettings: props.styleSettings, // style passed down from
         };
     }
 
@@ -189,6 +217,11 @@ export default class Train extends React.Component {
         window.removeEventListener("keydown", this.handleKeyDown);
     }
 
+    /**
+     * Delete/backspace to delete the last time entry
+     * Hold shift to clear entire session
+     * @param {Object} event 
+     */
     handleKeyDown = (event) => {
         if (event.key === 'Delete' || event.key === 'Backspace') {          
             if (event.shiftKey)
@@ -198,6 +231,10 @@ export default class Train extends React.Component {
         }
     }
 
+    /**
+     * Record a new time entry and update last entry
+     * @param {int} time Time in ms from timer
+     */
     handleTimerEnd(time) {
         let timesCopy = cloneDeep(this.state.times);
         let entry = clone(this.state.currentEntry);
@@ -206,9 +243,14 @@ export default class Train extends React.Component {
         entry.index = timesCopy.length;
         timesCopy.push(entry);
 
+        // Make a new scramble of a random case from the selection
         if (this.state.mode === 'random') {
             this.makeNewScramble();
         }
+        // If in recap mode
+        // Take the current case out of the recap array
+        // If the recap array is empty, refill it with the original selection
+        // Make a new scramble based on a case in whatever is left in the recap array
         else {
             let recapArrayCopy = clone(this.state.recapArray);
             recapArrayCopy.splice(recapArrayCopy.indexOf(entry.case), 1)
@@ -223,6 +265,12 @@ export default class Train extends React.Component {
         this.props.saveTrainInfo({ times: timesCopy, lastEntry: entry });
     }
 
+    /**
+     * Generate a new scramble
+     * If cases is defined, choose a random case from there
+     * Otherwise, choose a random case from the selected array or recap array based on the mode
+     * @param {int[]} cases Optional list of cases to choose from
+     */
     makeNewScramble(cases) {
         if (cases === undefined)
             cases = this.state.mode === 'random' ? this.state.selected : this.state.recapArray;
@@ -230,12 +278,19 @@ export default class Train extends React.Component {
         const alg = this.inverseScramble(sample(ollMap[caseNum]));
         const rotation = sample(["", "y", "y2", "y'"]);
         const finalAlg = this.applyAlgRotation(alg, rotation);
+        // currentEntry includes the scramble and case number
         const newEntry = {scramble: finalAlg, case: caseNum};
         this.setState({ currentEntry: newEntry });
         this.props.saveTrainInfo({ currentEntry: newEntry });
     }
 
-    // http://stackoverflow.com/questions/15604140/replace-multiple-strings-with-multiple-other-strings
+    /**
+     * http://stackoverflow.com/questions/15604140/replace-multiple-strings-with-multiple-other-strings
+     * Replace strings in strings according to a given mapping
+     * @param {string} str 
+     * @param {Object} mapObj object describing strings to replace
+     * @returns 
+     */
     replaceAll(str,mapObj) {
         if (!mapObj)
             return str;
@@ -246,6 +301,12 @@ export default class Train extends React.Component {
         });
     }
     
+    /**
+     * Rotate an algorithm around the vertical axis accordingly
+     * @param {string} alg 
+     * @param {string} rot type of rotation to apply to algorithm using cubing notation
+     * @returns algorithm rotated
+     */
     // returns new string with transformed algorithm.
     // Returnes sequence of moves that get the cube to the same position as (alg + rot) does, but without cube rotations.
     // Example: applyAlgRotation("R U R'", "y") = "F U F'"
@@ -261,8 +322,14 @@ export default class Train extends React.Component {
         return this.replaceAll(alg, mapObj);
     }
 
+    /**
+     * Take an algorithm and reverse
+     * If you perform the intial algorithm on a cube then perform the inverse scramble, the cube will not change
+     * @param {string} s initial scramble
+     * @returns inverse scramble/algorithm
+     */
     inverseScramble(s) {
-        // deleting parantheses and double spaces
+        // deleting parentheses and double spaces
         s = s.replaceAll('[', " ");
         s = s.replaceAll(']', " ");
         s = s.replaceAll('(', " ");
@@ -275,10 +342,13 @@ export default class Train extends React.Component {
         for (const move of arr) {
             if (move.length === 0)
                 continue;
+            // For double turns like U2, just flip the order of the 2 and the face letter
             if (move[move.length - 1] === '2')
                 result = move + " " + result;
+            // For prime turns like U', remove the ' to reverse it
             else if (move[move.length - 1] === '\'')
                 result = move.substring(0, move.length - 1) + " " + result;
+            // For regular moves like U, prepend the ' to reverse it
             else
                 result = move + "' " + result;
         }
@@ -286,13 +356,23 @@ export default class Train extends React.Component {
         return result.substring(0, result.length-1);
     }
 
+    /**
+     * Give each time object an appropriate index value based on its place in the array
+     * @param {Object[]} times list of entries of user times
+     * @returns times entries with index value added
+     */
     updateEntryIndeces(times) {
         for (var i = 0; i < times.length; i++)
             times[i]["index"] = i;
         return times;
     }
 
-    /// requests confirmation and deletes result
+    /**
+     * Ask the user if they are sure they want to remove a time
+     * They may have accidentally started/stopped the timer
+     * And do not wish to mess up their stats
+     * @param {int} i index of timei entry to remove
+     */
     confirmRem(i) {
         const ms = this.state.times[i].ms;
         if (window.confirm("Are you sure you want to remove this time?\n\n" + ms)) {
@@ -307,6 +387,11 @@ export default class Train extends React.Component {
         }
     }
 
+    /**
+     * Ask the user if they are sure they want to remove their most recently timed time
+     * They may have accidentally started/stopped the timer
+     * And do not wish to mess up their stats
+     */
     confirmRemLast() {
         if (isEmpty(this.state.times))
             return;
@@ -314,6 +399,9 @@ export default class Train extends React.Component {
         this.confirmRem(this.state.times.length - 1);
     }
 
+    /**
+     * Ask the user if they are sure they want to clear their session stats
+     */
     confirmClear() {
         if (this.state.times.length > 0) {
             if (window.confirm("Are you sure you want to clear session?")) {
@@ -325,6 +413,10 @@ export default class Train extends React.Component {
         }
     }
 
+    /**
+     * Ask the user if they are sure they want to unselect a case
+     * @param {int} caseNum number of case to unselect
+     */
     confirmUnsel(caseNum) {
         if (window.confirm("Do you want to unselect this case?")) {
             let newSelected = clone(this.state.selected);
@@ -332,6 +424,7 @@ export default class Train extends React.Component {
 
             if (newSelected.length > 0) {
                 let set = newSelected;
+                // Remove it from the recap array if in recap mode
                 if (this.state.mode === 'recap') {
                     let newRecapArray = clone(this.state.recapArray);
                     newRecapArray.splice(newRecapArray.indexOf(caseNum), 1);
@@ -346,24 +439,27 @@ export default class Train extends React.Component {
         }
     }
 
+    /**
+     * Apply style settings to the page
+     * @param {Object} newStyle 
+     */
     applyStyle(newStyle) {
         let style = this.state.styleSettings;
 
-        if (newStyle.hasOwnProperty('backgroundColor'))
-            style.backgroundColor = newStyle.backgroundColor;
-        if (newStyle.hasOwnProperty('buttonColor'))
-            style.buttonColor = newStyle.buttonColor;
-        if (newStyle.hasOwnProperty('textColor'))
-            style.textColor = newStyle.textColor;
-        if (newStyle.hasOwnProperty('linkColor'))
-            style.linkColor = newStyle.linkColor;
-        if (newStyle.hasOwnProperty('accentColor'))
-            style.accentColor = newStyle.accentColor;
+        for (const propertyName of styleSettingNames) {
+            if (newStyle.hasOwnProperty(propertyName))
+                style[propertyName] = newStyle[propertyName];
+        }
 
         this.setState({ styleSettings: style })
         this.props.applyStyle(style);
     }
 
+    /**
+     * 
+     * @param {string} propertyName 
+     * @param {Object} event 
+     */
     // https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-controlled-component
     handleColorInputChange = (propertyName, event) => {
         this.applyStyle({ [propertyName]: event.target.value });
