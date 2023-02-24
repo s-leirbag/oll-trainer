@@ -17,31 +17,35 @@ import { clone } from 'lodash';
 function saveLocal(name, value) {
   // If the platform supports localStorage, then save the value
   try {
-      localStorage.setItem(name, value);
-      return true;
+    localStorage.setItem(name, value);
+    return true;
   }
   catch(e) {
-      // Most likely cause of errors is a very old browser that doesn't support localStorage (fail silently)
-      console.warn("saving error");
-      return false;
+    // Most likely cause of errors is a very old browser that doesn't support localStorage (fail silently)
+    console.warn("saving error");
+    return false;
   }
 }
 
 /**
- * Load a local value or the specified default value if there is an error
+ * Load a local value or the specified default value if there is an error or it is null
  * @param {string} name 
  * @param {*} defaultValue Default value to return if error
  * @returns 
  */
 function loadLocal(name, defaultValue) {
-  // If the platform supports localStorage, then load the selection
   try {
-      return localStorage.getItem(name);
+    // If the platform supports localStorage, load the value
+    let value = localStorage.getItem(name);
+    // If no value is stored, use defaultValue
+    if (value == null)
+      value = defaultValue;
+    return value;
   }
   catch(e) {
-      // Either no selection in localStorage or browser does not support localStorage (fail silently)
-      console.warn("can't load from localstorage");
-      return defaultValue;
+    // Either no selection in localStorage or browser does not support localStorage (fail silently)
+    console.warn("can't load from localstorage");
+    return defaultValue;
   }
 }
 
@@ -52,18 +56,15 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        // Different modes on training app
-        // CaseSelect is front page, selecting apps
-        // Random is training page with random cases given
-        // Recap is training page going through each case once
-        mode: 'caseselect', // caseselect, random, recap
-        selected: [], // selected cases in the form of case number
-        times: [], // stat entries from previously timed cases in training
-        lastEntry: {}, // entry from last case timed in training
-        currentEntry: {}, // entry of current case in training, current scramble above the timer
-        recapArray: [], // tracks cases left to serve to user in recap mode
-        selChanged: false, // tell if selection has changed to update recap array
-        style: clone(stylePresets[defaultPreset]), // tracks style settings for user
+      // Different modes on training app
+      // CaseSelect is front page, selecting apps
+      // Random is training page with random cases given
+      // Recap is training page going through each case once
+      mode: 'caseselect', // caseselect, random, recap
+      selected: [], // selected cases in the form of case number
+      times: [], // stat entries from previously timed cases in training
+      lastEntry: {}, // entry from last case timed in training
+      style: clone(stylePresets[defaultPreset]), // tracks style settings for user
     };
   }
 
@@ -78,54 +79,31 @@ export default class App extends React.Component {
 
   /**
    * Save training variables to local storage, update app state:
-   * times, lastEntry, currentEntry, recapArray
+   * times, lastEntry
    * @param {Object} info 
    */
   saveTrainInfo(info) {
-    if (info.hasOwnProperty('times')) {
-      this.setState({ times: info.times });
-      saveLocal('times', JSON.stringify(info.times));
-    }
-    if (info.hasOwnProperty('lastEntry')) {
-      this.setState({ lastEntry: info.lastEntry });
-      saveLocal('lastEntry', JSON.stringify(info.lastEntry));
-    }
-    if (info.hasOwnProperty('currentEntry')) {
-      this.setState({ currentEntry: info.currentEntry });
-      saveLocal('currentEntry', JSON.stringify(info.currentEntry));
-    }
-    if (info.hasOwnProperty('recapArray')) {
-      this.setState({ recapArray: info.recapArray });
-      saveLocal('recapArray', JSON.stringify(info.recapArray));
+    const trainInfoNames = ['times', 'lastEntry'];
+    for (const propertyName of trainInfoNames) {
+      if (info.hasOwnProperty(propertyName)) {
+        let state = { [propertyName]: info[propertyName]};
+        this.setState(state);
+        saveLocal(propertyName, JSON.stringify(info[propertyName]));
+      }
     }
   }
   
   /**
    * Save training variables:
-   * times, lastEntry, currentEntry, recapArray
+   * times, lastEntry
    */
   loadTrainInfo() {
-    let times = JSON.parse(loadLocal('times', '[]'));
-    if (times == null)
-      times = [];
-    
-    let lastEntry = JSON.parse(loadLocal('lastEntry', '{}'));
-    if (lastEntry == null)
-      lastEntry = {};
-    
-    let currentEntry = JSON.parse(loadLocal('currentEntry', '{}'));
-    if (currentEntry == null)
-      currentEntry = {};
-
-    let recapArray = JSON.parse(loadLocal('recapArray', '{}'));
-    if (recapArray == null)
-      recapArray = {};
+    const times = JSON.parse(loadLocal('times', '[]'));
+    const lastEntry = JSON.parse(loadLocal('lastEntry', '{}'));
     
     this.saveTrainInfo({
-      // times: times,
-      lastEntry: lastEntry, 
-      currentEntry: currentEntry,
-      recapArray: recapArray
+      times: times,
+      lastEntry: lastEntry,
     });
   }
 
@@ -135,7 +113,7 @@ export default class App extends React.Component {
    * @returns true if success
    */
   saveSelection(selected) {
-    this.setState({ selected: selected, selChanged: true });
+    this.setState({ selected: selected });
     return saveLocal('selected', JSON.stringify(selected));
   }
   
@@ -144,8 +122,6 @@ export default class App extends React.Component {
    */
   loadSelection() {
     let selected = JSON.parse(loadLocal('selected', '[31,32]'));
-    if (selected == null)
-      selected = [31,32];
     this.saveSelection(selected);
   }
 
@@ -169,15 +145,13 @@ export default class App extends React.Component {
    * Load style settings
    */
   loadStyle() {
-    let style = JSON.parse(loadLocal('style', ''));
-    if (style == null)
-      style = clone(stylePresets[defaultPreset]);
+    const defaultStyle = clone(stylePresets[defaultPreset]);
+    let style = JSON.parse(loadLocal('style', JSON.stringify(defaultStyle)));
     this.saveStyle(style);
   }
 
   /**
    * Change app modes
-   * Update recap array if switching to recap mode and selection has changed
    * 
    * CaseSelect is front page, selecting apps
    * Random is training page with random cases given
@@ -186,12 +160,6 @@ export default class App extends React.Component {
    */
   changeMode(mode) {
     this.setState({ mode: mode });
-    if (mode === 'recap') {
-      let newRecapArray = this.state.recapArray;
-      if (this.state.selChanged)
-        newRecapArray = this.state.selected;
-      this.setState({ recapArray: newRecapArray, selChanged: false });
-    }
   }
 
   /**
@@ -223,8 +191,6 @@ export default class App extends React.Component {
           saveTrainInfo={(info) => this.saveTrainInfo(info)}
           times={this.state.times}
           lastEntry={this.state.lastEntry}
-          currentEntry={this.state.currentEntry}
-          recapArray={this.state.recapArray}
           applyStyle={(style) => this.saveStyle(style)}
           styleSettings={this.state.style}
         />

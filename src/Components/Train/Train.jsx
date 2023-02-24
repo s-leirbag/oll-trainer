@@ -195,8 +195,8 @@ export default class Train extends React.Component {
             mode: props.mode,
             selected: props.selected, // selected cases in the form of case number
             times: props.times, // list of time entries
-            recapArray: props.recapArray, // tracks cases left to serve to user in recap mode
-            currentEntry: props.currentEntry, // entry of current case in training, current scramble above the timer
+            recapArray: props.selected, // tracks cases left to serve to user in recap mode, initially fill with entire selection
+            currentEntry: null, // entry of current case in training, current scramble above the timer
             lastEntry: props.lastEntry, // entry from last case timed in training
             caseDisplayed: -1, // current case having its info box displayed, -1 to indicate no case info box shown
             sizes: {
@@ -243,21 +243,22 @@ export default class Train extends React.Component {
         entry.index = timesCopy.length;
         timesCopy.push(entry);
 
-        // Make a new scramble of a random case from the selection
         if (this.state.mode === 'random') {
+            // Make a new scramble of a random case from the selection
             this.makeNewScramble();
         }
-        // If in recap mode
-        // Take the current case out of the recap array
-        // If the recap array is empty, refill it with the original selection
-        // Make a new scramble based on a case in whatever is left in the recap array
-        else {
+        else if (this.state.mode === 'recap') {
             let recapArrayCopy = clone(this.state.recapArray);
+
+            // Take the current case out of the recap array
+            // If the recap array is empty, refill it with the original selection
             recapArrayCopy.splice(recapArrayCopy.indexOf(entry.case), 1)
             if (isEmpty(recapArrayCopy))
                 recapArrayCopy = clone(this.state.selected);
+            
             this.setState({ recapArray: recapArrayCopy });
-            this.props.saveTrainInfo({ recapArray: recapArrayCopy });
+
+            // Make a new scramble based on a case in whatever is left in the recap array
             this.makeNewScramble(recapArrayCopy);
         }
 
@@ -281,7 +282,6 @@ export default class Train extends React.Component {
         // currentEntry includes the scramble and case number
         const newEntry = {scramble: finalAlg, case: caseNum};
         this.setState({ currentEntry: newEntry });
-        this.props.saveTrainInfo({ currentEntry: newEntry });
     }
 
     /**
@@ -429,7 +429,6 @@ export default class Train extends React.Component {
                     let newRecapArray = clone(this.state.recapArray);
                     newRecapArray.splice(newRecapArray.indexOf(caseNum), 1);
                     this.setState({ recapArray: newRecapArray });
-                    this.props.saveTrainInfo({recapArray: newRecapArray});
                     set = newRecapArray;
                 }
                 this.makeNewScramble(set);
@@ -504,15 +503,18 @@ export default class Train extends React.Component {
         const style = this.state.styleSettings;
         const times = this.state.times;
         const nSelected = this.state.selected.length;
+        const currentEntry = this.state.currentEntry;
         
         let selInfo, scramInfo, lastScramInfo;
 
         if (nSelected > 0) {
             if (this.state.mode === 'random')
                 selInfo = " | random mode: " + nSelected + " cases selected";
-            else
+            else if (this.state.mode === 'recap')
                 selInfo = " | recap mode: " + (this.state.recapArray.length + 0) + " cases left";
-            scramInfo = "scramble: " + this.state.currentEntry.scramble;
+            // currentEntry is null on the first frame
+            if (currentEntry)
+                scramInfo = "scramble: " + currentEntry.scramble;
         } else {
             selInfo = "";
             scramInfo = "click \"select cases\" above and pick some OLLs to practice";
