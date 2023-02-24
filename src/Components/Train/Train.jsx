@@ -233,7 +233,7 @@ export default class Train extends React.Component {
 
     /**
      * Record a new time entry and update last entry
-     * @param {int} time Time in ms from timer
+     * @param {number} time Time in ms from timer
      */
     handleTimerEnd(time) {
         let timesCopy = cloneDeep(this.state.times);
@@ -270,7 +270,7 @@ export default class Train extends React.Component {
      * Generate a new scramble
      * If cases is defined, choose a random case from there
      * Otherwise, choose a random case from the selected array or recap array based on the mode
-     * @param {int[]} cases Optional list of cases to choose from
+     * @param {number[]} cases Optional list of cases to choose from
      */
     makeNewScramble(cases) {
         if (cases === undefined)
@@ -289,11 +289,15 @@ export default class Train extends React.Component {
      * Replace strings in strings according to a given mapping
      * @param {string} str 
      * @param {Object} mapObj object describing strings to replace
-     * @returns 
+     * @returns Modified string
      */
     replaceAll(str,mapObj) {
         if (!mapObj)
             return str;
+        
+        // Join mapping keys together with | to search for matching strings to replace
+        // g flag: global, replace all matches
+        // i flag: ignore case
         let re = new RegExp(Object.keys(mapObj).join("|"),"gi");
 
         return str.replace(re, function(matched){
@@ -371,7 +375,7 @@ export default class Train extends React.Component {
      * Ask the user if they are sure they want to remove a time
      * They may have accidentally started/stopped the timer
      * And do not wish to mess up their stats
-     * @param {int} i index of timei entry to remove
+     * @param {number} i index of timei entry to remove
      */
     confirmRem(i) {
         const ms = this.state.times[i].ms;
@@ -395,7 +399,6 @@ export default class Train extends React.Component {
     confirmRemLast() {
         if (isEmpty(this.state.times))
             return;
-
         this.confirmRem(this.state.times.length - 1);
     }
 
@@ -415,7 +418,7 @@ export default class Train extends React.Component {
 
     /**
      * Ask the user if they are sure they want to unselect a case
-     * @param {int} caseNum number of case to unselect
+     * @param {number} caseNum number of case to unselect
      */
     confirmUnsel(caseNum) {
         if (window.confirm("Do you want to unselect this case?")) {
@@ -455,7 +458,7 @@ export default class Train extends React.Component {
     }
 
     /**
-     * 
+     * Change a color in the style settings based on an input event
      * @param {string} propertyName 
      * @param {Object} event 
      */
@@ -464,25 +467,45 @@ export default class Train extends React.Component {
         this.applyStyle({ [propertyName]: event.target.value });
     };
 
+    /**
+     * Adjust the size of the timer or scramble
+     * @param {string} element 
+     * @param {number} increment 
+     */
     adjustSize(element, increment) {
         let sizes = this.state.sizes;
         sizes[element] += increment;
         this.setState({ sizes: sizes });
     }
 
+    /**
+     * Set the style settings to a preset
+     * @param {string} preset 
+     */
     setStyle(preset) {
         const style = stylePresets[preset];
         this.applyStyle(style);
     }
 
+    /**
+     * Display a hint box for a case
+     * @param {number} i number of case to display a hint box for
+     */
     displayBox(i) {
         this.setState({ caseDisplayed: i });
     }
 
+    /**
+     * Hide a hint box for a case
+     */
     hideBox() {
         this.setState({ caseDisplayed: -1 });
     }
 
+    /**
+     * Render a hintbox if one is currently displayed
+     * @returns jsx for a HintBox or null if not dispalyed
+     */
     renderHintBox() {
         let hintBox = "";
         if (this.state.caseDisplayed !== -1) {
@@ -498,6 +521,73 @@ export default class Train extends React.Component {
         return hintBox;
     }
 
+    /**
+     * Render a setting with buttons shorter using a function
+     */
+    renderSettingButtons(name, buttonName1, buttonName2, onClick1, onClick2, style, key) {
+        return (
+            <SettingButtons
+                name={name}
+                buttonName1={buttonName1}
+                buttonName2={buttonName2}
+                onClick1={onClick1}
+                onClick2={onClick2}
+                styleSettings={style}
+                key={key}
+            />
+        );
+    }
+
+    /**
+     * Render a setting with text input shorter using a function
+     */
+    renderSettingInput(name, value, onChange) {
+        return (
+            <SettingInput
+                name={name}
+                value={value}
+                onChange={onChange}
+            />
+        );
+    }
+
+    /**
+     * Render the settings buttons and text input at the bottom of the train page
+     * @returns jsx for settings
+     */
+    renderSettings() {
+        const style = this.state.styleSettings;
+        return (
+            <div>
+                {this.renderSettingButtons('Timer Size', '+', '-',
+                        () => this.adjustSize('timer', 16), () => this.adjustSize('timer', -16),
+                        style, 'timer' + style.buttonColor)}
+                {this.renderSettingButtons('Scramble Size', '+', '-',
+                        () => this.adjustSize('timer', 8), () => this.adjustSize('timer', -8),
+                        style, 'scramble' + style.buttonColor)}
+                {this.renderSettingButtons('Color Presets', 'Light', 'Dark',
+                        () => this.setStyle('light'), () => this.setStyle('dark'),
+                        style, 'presets' + style.buttonColor)}
+                <span>Specific Colors: </span>
+                {this.renderSettingInput('Background: ', style.backgroundColor,
+                        (event) => this.handleColorInputChange('backgroundColor', event))}
+                {this.renderSettingInput('Button: ', style.buttonColor,
+                        (event) => this.handleColorInputChange('buttonColor', event))}
+                {this.renderSettingInput('Text: ', style.textColor,
+                        (event) => this.handleColorInputChange('textColor', event))}
+                {/* {this.renderSettingInput('Link: ', style.linkColor,
+                        (event) => this.handleColorInputChange('linkColor', event))} */}
+                {this.renderSettingInput('Accent: ', style.accentColor,
+                        (event) => this.handleColorInputChange('accentColor', event))}
+            </div>
+        );
+    }
+
+    /**
+     * Render page
+     * Use user's style settings, pass needed info along
+     * @returns Train jsx
+     */
     render() {
         const sizes = this.state.sizes;
         const style = this.state.styleSettings;
@@ -507,6 +597,8 @@ export default class Train extends React.Component {
         
         let selInfo, scramInfo, lastScramInfo;
 
+        // selInfo is the note at the top saying the mode and # of cases
+        // scramInfo is the scramble
         if (nSelected > 0) {
             if (this.state.mode === 'random')
                 selInfo = " | random mode: " + nSelected + " cases selected";
@@ -520,6 +612,7 @@ export default class Train extends React.Component {
             scramInfo = "click \"select cases\" above and pick some OLLs to practice";
         }
 
+        // Display the last scramble if applicable, and a button to remove it from the selection of cases
         const lastCase = this.state.lastEntry.case;
         if (!isEmpty(times) && lastCase !== -1) {
             let button = "";
@@ -532,8 +625,6 @@ export default class Train extends React.Component {
                 </div>
             );
         }
-
-        const hintBox = this.renderHintBox();
 
         return (
             <div className='train'>
@@ -570,65 +661,12 @@ export default class Train extends React.Component {
                 </tr>
                 <tr>
                     <td colSpan="2">
-                        <SettingButtons
-                            name='Timer Size'
-                            buttonName1='+'
-                            buttonName2='-'
-                            onClick1={() => this.adjustSize('timer', 16)}
-                            onClick2={() => this.adjustSize('timer', -16)}
-                            styleSettings={style}
-                            key={'timer' + style.buttonColor}
-                        />
-                        <SettingButtons
-                            name='Scramble Size'
-                            buttonName1='+'
-                            buttonName2='-'
-                            onClick1={() => this.adjustSize('scramble', 8)}
-                            onClick2={() => this.adjustSize('scramble', -8)}
-                            styleSettings={style}
-                            key={'scramble' + style.buttonColor}
-                        />
-                        <SettingButtons
-                            name='Color Presets'
-                            buttonName1='Light'
-                            buttonName2='Dark'
-                            onClick1={() => this.setStyle('light')}
-                            onClick2={() => this.setStyle('dark')}
-                            styleSettings={style}
-                            key={'presets' + style.buttonColor}
-                        />
-                        <span>Specific Colors: </span>
-                        <SettingInput
-                            name='Background: '
-                            value={style.backgroundColor}
-                            onChange={(event) => this.handleColorInputChange('backgroundColor', event)}
-                        />
-                        <SettingInput
-                            name=' Button: '
-                            value={style.buttonColor}
-                            onChange={(event) => this.handleColorInputChange('buttonColor', event)}
-                        />
-                        <SettingInput
-                            name=' Text: '
-                            value={style.textColor}
-                            onChange={(event) => this.handleColorInputChange('textColor', event)}
-                        />
-                        {/* <SettingInput
-                            name=' Link: '
-                            value={style.linkColor}
-                            onChange={(event) => this.handleColorInputChange('linkColor', style)}
-                        /> */}
-                        <SettingInput
-                            name=' Accent: '
-                            value={style.accentColor}
-                            onChange={(event) => this.handleColorInputChange('accentColor', event)}
-                        />
-
+                        {this.renderSettings()}
                         {lastScramInfo}
                     </td>
                 </tr>
             </tbody></table>
-            {hintBox}
+            {this.renderHintBox()}
             </div>
         )
     }

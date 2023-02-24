@@ -109,7 +109,7 @@ export default class App extends React.Component {
 
   /**
    * Save array of selected cases to local storage, update app state
-   * @param {int[]} selected 
+   * @param {number[]} selected 
    * @returns true if success
    */
   saveSelection(selected) {
@@ -165,7 +165,7 @@ export default class App extends React.Component {
   /**
    * Render app
    * Show appropriate component based on mode
-   * Use user's style settings, pass needed info to hard drive
+   * Use user's style settings, pass needed info along
    * @returns App jsx
    */
   render() {
