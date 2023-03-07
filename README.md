@@ -8,8 +8,9 @@ It is heavily based on https://github.com/Roman-/oll_trainer by Roman Strakhov b
 
 ## To-do
 
-- Refactor
-- Comment code
+- Move to mui
+- Use Typescript
+- Fix selected cases not being highlighted when site is first loaded
 - Improve layout
   - Add button to change between recap and random mode
   - Add button to reset recap mode
@@ -17,7 +18,6 @@ It is heavily based on https://github.com/Roman-/oll_trainer by Roman Strakhov b
   - Add options for accent color
   - Add customization settings to all pages
   - Fix button color updating
-- Move to mui
 
 ## Credits
 

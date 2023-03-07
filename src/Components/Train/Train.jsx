@@ -1,6 +1,6 @@
 import React from 'react';
 import "./Train.css";
-import Button from "../Button/Button.jsx";
+import { Button, ButtonGroup } from '@mui/material';
 import Timer from "../Timer/Timer.jsx";
 import { styleSettingNames, stylePresets } from '../../StylePresets';
 import { algsInfo, ollMap } from '../../Constants';
@@ -126,7 +126,9 @@ class Stats extends React.Component {
             <td id="stats">
                 <div className="resultInfoHeader">
                     {this.props.times.length} times
-                    <Button name='Clear' onClick={() => this.props.confirmClear()} styleSettings={style} key={style.buttonColor}/>
+                    <Button variant='outline' onClick={() => this.props.confirmClear()} key={style.buttonColor}>
+                        Clear
+                    </Button>
                     :
                 </div>
                 <div>
@@ -148,16 +150,14 @@ function SettingButtons(props) {
     return (
         <div>
             {props.name}
-            <Button
-                name={props.buttonName1}
-                onClick={() => props.onClick1()}
-                styleSettings={props.styleSettings}
-            />
-            <Button
-                name={props.buttonName2}
-                onClick={() => props.onClick2()}
-                styleSettings={props.styleSettings}
-            />
+            <ButtonGroup variant="outlined" aria-label="outlined button group">
+                <Button onClick={() => props.onClick1()}>
+                    {props.buttonName1}
+                </Button>
+                <Button onClick={() => props.onClick2()}>
+                    {props.buttonName2}
+                </Button>
+            </ButtonGroup>
             <br/>
         </div>
     );
@@ -563,7 +563,7 @@ export default class Train extends React.Component {
                         () => this.adjustSize('timer', 16), () => this.adjustSize('timer', -16),
                         style, 'timer' + style.buttonColor)}
                 {this.renderSettingButtons('Scramble Size', '+', '-',
-                        () => this.adjustSize('timer', 8), () => this.adjustSize('timer', -8),
+                        () => this.adjustSize('scramble', 8), () => this.adjustSize('scramble', -8),
                         style, 'scramble' + style.buttonColor)}
                 {this.renderSettingButtons('Color Presets', 'Light', 'Dark',
                         () => this.setStyle('light'), () => this.setStyle('dark'),
@@ -617,7 +617,7 @@ export default class Train extends React.Component {
         if (!isEmpty(times) && lastCase !== -1) {
             let button = "";
             if (this.state.selected.includes(lastCase))
-                button = <Button name='Unselect' onClick={() => this.confirmUnsel(lastCase)} styleSettings={style} key={style.buttonColor}/>;
+                button = <Button variant='contained' onClick={() => this.confirmUnsel(lastCase)} key={style.buttonColor}>Unselect</Button>;
             lastScramInfo = (
                 <div>
                     Last Scramble: {this.state.lastEntry.scramble + ' (' + algsInfo[lastCase]['name'] + ')'}
@@ -631,12 +631,13 @@ export default class Train extends React.Component {
             <table id='mainTable'><tbody>
                 <tr><td colSpan='2'>
                     <Button
-                        name='Select Cases'
+                        variant='contained'
                         id='selectBtn'
                         onClick={() => this.props.changeMode('caseselect')}
-                        styleSettings={style}
                         key={style.buttonColor}
-                    />
+                    >
+                        Select Cases
+                    </Button>
                     {selInfo}
                 </td></tr>
                 <tr><td id="scramble" colSpan="2" style={{ fontSize: sizes['scramble'] }} >{scramInfo}</td></tr>

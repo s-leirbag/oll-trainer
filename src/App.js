@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+import CssBaseline from '@mui/material/CssBaseline';
 import { styleSettingNames, defaultPreset, stylePresets } from './StylePresets.js';
 import Egg from './Components/Button/Egg.jsx'
 import CaseSelect from './Components/CaseSelect/CaseSelect.jsx';
@@ -202,13 +203,14 @@ export default class App extends React.Component {
     // Leave Easter egg button on both selection and training pages
     return (
       <div className="App"
-        style={{
-          backgroundColor: style.backgroundColor,
-          color: style.textColor,
-        }}
+        // style={{
+        //   backgroundColor: style.backgroundColor,
+        //   color: style.textColor,
+        // }}
       >
+        <CssBaseline />
         {app}
-        <Egg styleSettings={style}/>
+        {/* <Egg styleSettings={style}/> */}
       </div>
     );
   }

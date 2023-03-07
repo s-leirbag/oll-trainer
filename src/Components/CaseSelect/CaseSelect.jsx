@@ -1,6 +1,6 @@
 import React from 'react';
 import "./CaseSelect.css";
-import Button from "../Button/Button.jsx";
+import Button from '@mui/material/Button';
 import { algsGroups, renderGroups, algsInfo } from '../../Constants';
 import { clone } from 'lodash';
 
@@ -200,8 +200,8 @@ export default class CaseSelect extends React.Component {
         /**
          * Button style for the buttons that change to the training modes, random/recap
          */
-        let trainButtonStyle = clone(style);
-        trainButtonStyle.float = 'left';
+        // let trainButtonStyle = clone(style);
+        // trainButtonStyle.float = 'left';
 
         return (
             <div className="caseselect">
@@ -235,20 +235,23 @@ export default class CaseSelect extends React.Component {
             <div className="train-buttons">
                 <h1>Train</h1>
                 <Button
-                    name='Random mode'
+                    variant='contained'
                     onClick={() => this.props.changeMode('random')}
                     title='Train selected cases randomly'
-                    styleSettings={trainButtonStyle}
-                />
+                >
+                    Random mode
+                </Button>
                 <p>
                     Gives you random cases from your selection.
                 </p>
                 <Button
-                    name='Recap mode'
+                    variant='contained'
                     onClick={() => this.props.changeMode('recap')}
                     title='Go through all the selected cases once'
-                    styleSettings={trainButtonStyle}
-                />
+                >
+                    Recap mode
+                </Button>
+
                 <p>
                     Goes through all the selected cases once.
                 </p>

@@ -36,6 +36,7 @@ td {border: 1px solid #000;}
 }
 
 /* done button that appends ">" on hover */
+/*
 button {
     float: right;
     display: inline-block; border-radius: 2px; border: none; text-align: center; font-size: 28px; padding: 10px; transition: all 0.3s; cursor: pointer; margin: 5px;}
@@ -44,3 +45,4 @@ button span:after {content: '»'; position: absolute; opacity: 0; top: 0; right:
 button:hover span { padding-right: 25px;}
 button:hover {}
 button:hover span:after {opacity: 1; right: 0;}
+*/
