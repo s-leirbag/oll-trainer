@@ -10,30 +10,30 @@ button:hover {}
 button:hover span:after {opacity: 1; right: 0;}
 */
 
-#scramble {
-    /* text-align: left; */
-}
+/* #scramble {
+    text-align: left;
+} */
 
-.big {
+/* .big {
 	font-size: 30px;
-}
+} */
 
-table#mainTable {
+/* table#mainTable {
 	width: 100vw;
 	height: 100vh;
-}
+} */
 
-td {
+/* td {
 	border: 1px solid #aaa;
 	padding: 4px;
-}
+} */
 
 /* Stats */
-#stats {
+/* #stats {
     width: 30%;
     height: 100%;
     vertical-align: top;
-}
+} */
 
 .timeResult {
     cursor: pointer;
@@ -54,36 +54,36 @@ td {
     cursor: pointer;
 }
 
-#times {
+/* #times {
     font-family: "Courier New", Courier, monospace;
 	overflow: scroll;
 	overflow-x: hidden;
-	height: 95%;  /*gk*/
-}
+	height: 95%;
+} */
 
-span.ollNameStats{
+/* span.ollNameStats{
 	font-family: "Times New Roman", Georgia, Serif;
 	font-weight: bold;
-}
+} */
 
-div.ollNameHeader {
+/* div.ollNameHeader {
 	border-top: #aaa solid 1px;
-}
+} */
 
-span.ollNameStats {
+/* span.ollNameStats {
     cursor: pointer;
-}
+} */
 
-span.ollNameStats:hover {
+/* span.ollNameStats:hover {
     color: green;
-}
+} */
 
-input[type=text] {
+/* input[type=text] {
     border: 1px solid gray;
-}
+} */
 
 /*popup box with OLL case picture and info*/
-#box {
+/* #box {
 }
 #boxImg {
     width: 150px;
@@ -94,16 +94,16 @@ input[type=text] {
 }
 
 #boxalg {
-    /*border: 0px;*/
+    border: 0px;
 }
 #boxalternative {
-    /*border: 0px;*/
+    border: 0px;
 }
 #boxsetup {
     font-style: italic;
-}
+} */
 
-#hintWindowBack {
+/* #hintWindowBack {
 	-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;
 	position: fixed;
 	left: 0;
@@ -116,11 +116,11 @@ input[type=text] {
 }
 
 #hintWindow {
-	/*-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;*/
+	-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;
 	position: fixed;
 	z-index: 20;
     top: 40%;
     left: 50%;
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
-}
+} */

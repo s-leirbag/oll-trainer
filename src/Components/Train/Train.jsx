@@ -1,14 +1,22 @@
 import React from 'react';
+
 import "./Train.css";
-import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import Typography from '@mui/material/Typography';
+import Stats from "./Stats.jsx";
 import Timer from "../Timer/Timer.jsx";
 import { styleSettingNames, stylePresets } from '../../StylePresets';
 import { algsInfo, ollMap } from '../../Constants';
-import { msToReadable, logTabSep } from '../../Utils';
+
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Typography from '@mui/material/Typography';
+
+import { msToReadable, inverseScramble, logTabSep } from '../../Utils';
 import { clone, cloneDeep, sample, isEmpty, sortBy } from 'lodash';
 
 function ToggleButtons(props) {
@@ -22,8 +30,8 @@ function ToggleButtons(props) {
     };
   
     return (
-      <>
-      <Typography>
+      <Paper sx={{ padding: 2, position: 'fixed', top: 10, right: 10 }}>
+      <Typography variant='h4' component='h4'>
         Mode
       </Typography>
       <ToggleButtonGroup
@@ -39,144 +47,8 @@ function ToggleButtons(props) {
           Recap
         </ToggleButton>
       </ToggleButtonGroup>
-      </>
+      </Paper>
     );
-}
-
-/**
- * Info box for cases
- */
-function HintBox(props) {
-    const i = props.i;
-    const name = algsInfo[i]["name"];
-    const alg1 = algsInfo[i]["a"];
-    const alg2 = algsInfo[i]["a2"];
-
-    return (
-        <div>
-            <table id="hintWindow" style={{backgroundColor: props.styleSettings.backgroundColor}}><tbody>
-                <tr>
-                    <td rowSpan='4'>
-                        <img id='boxImg' src={"pic/" + i + ".svg"} alt={name}/>
-                    </td>
-                    <td id='boxTitle'>
-                        #{i} {name}
-                    </td>
-                </tr>
-                <tr><td id='boxalg'>
-                    {alg1}
-                    {alg2 !== "" ? <div><br/>{alg2}</div> : ""}
-                </td></tr>
-                <tr><td id='boxsetup'>
-                    Setup: {props.inverseScramble(alg1)/* ollMap[i][0] */}
-                </td></tr>
-            </tbody></table>
-            <div id="hintWindowBack" onClick={() => props.hideBox()}></div>
-        </div>
-    );
-}
-
-/**
- * Section of stats
- * Includes case name, average time, and times
- */
-function TimesGroup(props) {
-    let sum = 0;
-    let timesList = [];
-    for (const i in props.caseTimes) {
-        const entry = props.caseTimes[i];
-        sum += entry.time;
-        timesList.push(
-            <span
-                className={(entry === props.lastEntry) ? "timeResultBold" : "timeResult"}
-                title={entry.scramble}
-                onClick={() => props.confirmRem(entry.index)}
-                key={i}
-            >
-                {entry.ms}{(i < props.caseTimes.length - 1) ? ', ' : ''}
-            </span>
-        )
-    }
-
-    const avg = msToReadable(sum / props.caseTimes.length)
-    const name = algsInfo[props.caseNum]["name"];
-
-    return (
-        <div className='ollTimes'>
-            <div className='ollNameHeader'>
-                <span
-                    className='ollNameStats'
-                    onClick={() => props.displayBox()}
-                >
-                    {name}
-                </span>
-                : {avg} average
-            </div>
-            {timesList}
-            <br/><br/>
-        </div>
-    );
-}
-
-/**
- * Section of stats/times
- * Sorts list of times by case and makes according TimesGroup components
- */
-class Stats extends React.Component {
-    /**
-     * Sort list of times by case
-     * @param {Object[]} times 
-     * @returns 
-     */
-    getResultsByCase(times) {
-        let resultsByCase = {};
-        for (const entry of times) {
-            const caseNum = entry.case;
-            if (resultsByCase[caseNum] == null)
-                resultsByCase[caseNum] = [];
-            resultsByCase[caseNum].push(entry);
-        }
-        return resultsByCase;
-    }
-
-    render() {
-        const resultsByCase = this.getResultsByCase(this.props.times);
-        const keys = sortBy(Object.keys(resultsByCase).map(Number));
-
-        let groupsList = [];
-        for (const i of keys) {
-            groupsList.push(
-                <TimesGroup
-                    key={i}
-                    displayBox={() => this.props.displayBox(i)}
-                    confirmRem={(i) => this.props.confirmRem(i)}
-                    caseTimes={resultsByCase[i]}
-                    caseNum={i}
-                    lastEntry={this.props.lastEntry}
-                />
-            );
-        }
-
-        const style = this.props.styleSettings;
-        return (
-            <td id="stats">
-                <div className="resultInfoHeader">
-                    {this.props.times.length} times
-                    <Button variant='outline' onClick={() => this.props.confirmClear()} key={style.buttonColor}>
-                        Clear
-                    </Button>
-                    :
-                </div>
-                <div>
-                    Click case names for case info
-                    <br/>Click times to remove times
-                </div>
-                <div id="times">
-                    {groupsList}
-                </div>
-            </td>
-        );
-    }
 }
 
 /**
@@ -234,7 +106,6 @@ export default class Train extends React.Component {
             recapArray: props.selected, // tracks cases left to serve to user in recap mode, initially fill with entire selection
             currentEntry: null, // entry of current case in training, current scramble above the timer
             lastEntry: props.lastEntry, // entry from last case timed in training
-            caseDisplayed: -1, // current case having its info box displayed, -1 to indicate no case info box shown
             sizes: {
                 'timer': 90,
                 'scramble': 20,
@@ -312,7 +183,7 @@ export default class Train extends React.Component {
         if (cases === undefined)
             cases = this.state.mode === 'random' ? this.state.selected : this.state.recapArray;
         const caseNum = sample(cases);
-        const alg = this.inverseScramble(sample(ollMap[caseNum]));
+        const alg = inverseScramble(sample(ollMap[caseNum]));
         const rotation = sample(["", "y", "y2", "y'"]);
         const finalAlg = this.applyAlgRotation(alg, rotation);
         // currentEntry includes the scramble and case number
@@ -360,40 +231,6 @@ export default class Train extends React.Component {
             mapObj = {R:"L",L:"R",B:"F",F:"B"};
 
         return this.replaceAll(alg, mapObj);
-    }
-
-    /**
-     * Take an algorithm and reverse
-     * If you perform the intial algorithm on a cube then perform the inverse scramble, the cube will not change
-     * @param {string} s initial scramble
-     * @returns inverse scramble/algorithm
-     */
-    inverseScramble(s) {
-        // deleting parentheses and double spaces
-        s = s.replaceAll('[', " ");
-        s = s.replaceAll(']', " ");
-        s = s.replaceAll('(', " ");
-        s = s.replaceAll(')', " ");
-        while(s.indexOf("  ") !== -1)
-            s = s.replaceAll("  ", " ");
-    
-        let arr = s.split(" ");
-        let result = "";
-        for (const move of arr) {
-            if (move.length === 0)
-                continue;
-            // For double turns like U2, just flip the order of the 2 and the face letter
-            if (move[move.length - 1] === '2')
-                result = move + " " + result;
-            // For prime turns like U', remove the ' to reverse it
-            else if (move[move.length - 1] === '\'')
-                result = move.substring(0, move.length - 1) + " " + result;
-            // For regular moves like U, prepend the ' to reverse it
-            else
-                result = move + "' " + result;
-        }
-    
-        return result.substring(0, result.length-1);
     }
 
     /**
@@ -531,40 +368,6 @@ export default class Train extends React.Component {
     }
 
     /**
-     * Display a hint box for a case
-     * @param {number} i number of case to display a hint box for
-     */
-    displayBox(i) {
-        this.setState({ caseDisplayed: i });
-    }
-
-    /**
-     * Hide a hint box for a case
-     */
-    hideBox() {
-        this.setState({ caseDisplayed: -1 });
-    }
-
-    /**
-     * Render a hintbox if one is currently displayed
-     * @returns jsx for a HintBox or null if not dispalyed
-     */
-    renderHintBox() {
-        let hintBox = "";
-        if (this.state.caseDisplayed !== -1) {
-            hintBox = (
-                <HintBox
-                    i={this.state.caseDisplayed}
-                    inverseScramble={(s) => this.inverseScramble(s)}
-                    hideBox={() => this.hideBox()}
-                    styleSettings={this.state.styleSettings}
-                />
-            );
-        }
-        return hintBox;
-    }
-
-    /**
      * Render a setting with buttons shorter using a function
      */
     renderSettingButtons(name, buttonName1, buttonName2, onClick1, onClick2, style, key) {
@@ -669,54 +472,102 @@ export default class Train extends React.Component {
             );
         }
 
-        logTabSep('props', this.props.mode, 'state:', this.state.mode);
         return (
-            <div className='train'>
-            <table id='mainTable'><tbody>
-                <tr><td colSpan='2'>
+            <Container maxWidth="lg" sx={{ display: 'inline' }}>
+                <Box sx={{ flexGrow: 1 }}>
+                <Grid container spacing={2}>
+                    <Grid item xs={4}>
+                        <Stats
+                            times={times}
+                            confirmRem={(i) => this.confirmRem(i)}
+                            confirmClear={() => this.confirmClear()}
+                            lastEntry={this.state.lastEntry}
+                            displayBox={(i) => this.displayBox(i)}
+                            styleSettings={style}
+                        />
+                    </Grid>
+                    <Grid item xs={8}>
+                        <Box>
+                            <Typography variant='h5' component='h5'>
+                                {scramInfo} {/*style={{ fontSize: sizes['scramble'] }} */}
+                            </Typography>
+                            <Timer
+                                isActive={nSelected > 0}
+                                onTimerEnd={time => this.handleTimerEnd(time)}
+                                regularColor={style.textColor}
+                                prepColor={style.accentColor}
+                                fontSize={sizes['timer']}
+                            />
+                        </Box>
+                    </Grid>
+                </Grid>
+                </Box>
+
+                <Paper sx={{ padding: 2, position: 'fixed', top: 200, right: 10 }}>
                     <Button
                         variant='contained'
-                        id='selectBtn'
                         onClick={() => this.changeMode('caseselect')}
                         key={style.buttonColor}
                     >
                         Select Cases
                     </Button>
                     {nCases}
+                </Paper>
                     <ToggleButtons
                         mode={this.state.mode}
                         changeMode={(newMode) => this.changeMode(newMode)}
                     />
-                </td></tr>
-                <tr><td id="scramble" colSpan="2" style={{ fontSize: sizes['scramble'] }} >{scramInfo}</td></tr>
-                <tr>
-                    <td id="timer">
-                        <Timer
-                            isActive={nSelected > 0}
-                            onTimerEnd={time => this.handleTimerEnd(time)}
-                            regularColor={style.textColor}
-                            prepColor={style.accentColor}
-                            fontSize={sizes['timer']}
-                        />
-                    </td>
-                    <Stats
-                        times={times}
-                        confirmRem={(i) => this.confirmRem(i)}
-                        confirmClear={() => this.confirmClear()}
-                        lastEntry={this.state.lastEntry}
-                        displayBox={(i) => this.displayBox(i)}
-                        styleSettings={style}
-                    />
-                </tr>
-                <tr>
-                    <td colSpan="2">
                         {this.renderSettings()}
                         {lastScramInfo}
-                    </td>
-                </tr>
-            </tbody></table>
-            {this.renderHintBox()}
-            </div>
+            </Container>
         )
+
+        // (
+        //     <Container maxWidth="lg">
+        //     <table id='mainTable'><tbody>
+        //         <tr><td colSpan='2'>
+        //             <Button
+        //                 variant='contained'
+        //                 id='selectBtn'
+        //                 onClick={() => this.changeMode('caseselect')}
+        //                 key={style.buttonColor}
+        //             >
+        //                 Select Cases
+        //             </Button>
+        //             {nCases}
+        //             <ToggleButtons
+        //                 mode={this.state.mode}
+        //                 changeMode={(newMode) => this.changeMode(newMode)}
+        //             />
+        //         </td></tr>
+        //         <tr><td id="scramble" colSpan="2" style={{ fontSize: sizes['scramble'] }} >{scramInfo}</td></tr>
+        //         <tr>
+        //             <td id="timer">
+        //                 <Timer
+        //                     isActive={nSelected > 0}
+        //                     onTimerEnd={time => this.handleTimerEnd(time)}
+        //                     regularColor={style.textColor}
+        //                     prepColor={style.accentColor}
+        //                     fontSize={sizes['timer']}
+        //                 />
+        //             </td>
+        //             <Stats
+        //                 times={times}
+        //                 confirmRem={(i) => this.confirmRem(i)}
+        //                 confirmClear={() => this.confirmClear()}
+        //                 lastEntry={this.state.lastEntry}
+        //                 displayBox={(i) => this.displayBox(i)}
+        //                 styleSettings={style}
+        //             />
+        //         </tr>
+        //         <tr>
+        //             <td colSpan="2">
+        //                 {this.renderSettings()}
+        //                 {lastScramInfo}
+        //             </td>
+        //         </tr>
+        //     </tbody></table>
+        //     </Container>
+        // )
     }
 }

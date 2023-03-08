@@ -188,7 +188,6 @@ export default class App extends React.Component {
       );
     // Component Train is the training/timing page for mode random or recap
     } else {
-      logTabSep("app", this.state.mode);
       app = (
         <Train
           selected={this.state.selected}
