@@ -1,6 +1,10 @@
 import React from 'react';
 import "./CaseSelect.css";
 import Button from '@mui/material/Button';
+import Container from '@mui/material/Container'
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
 import { algsGroups, renderGroups, algsInfo } from '../../Constants';
 import { clone } from 'lodash';
 
@@ -204,59 +208,36 @@ export default class CaseSelect extends React.Component {
         // trainButtonStyle.float = 'left';
 
         return (
-            <div className="caseselect">
-            {/* Text info at the top of the page */}
-            <div className='case-select-header'>
-                <h1>OLL Trainer</h1>
-                <p>
-                    Welcome to the OLL trainer!
-                    <br/>OLL is a step in the CFOP speedcubing method 
-                    (<a href='https://jperm.net/3x3/cfop' style={{ color: style.linkColor }}>CFOP</a>).
-                    <br/>In OLL, you orient the last layer of pieces.
-                    <br/>
-                    <br/>There are 57 different OLL cases. Select/deselect them on the left by clicking the images.
-                    <br/>You can select/deselect all cases/cases in different groups by clicking the headers.
-                    <br/>
-                    <br/>Click the training buttons on the right to go into training mode!
-                    <br/>
-                    <br/>Enjoy!
-                    <br/>Gabriel Shiu
-                    <br/>
-                    <br/>GitHub repo: <a href='https://github.com/s-leirbag/oll-trainer' style={{ color: style.linkColor }}>click</a>
-                    <br/>Offline version: <a href='https://github.com/s-leirbag/oll-trainer/archive/refs/heads/main.zip' style={{ color: style.linkColor }}>zip</a>
-                </p>
-            </div>
+            <Container maxWidth="sm">
+                {/* Text info at the top of the page */}
+                <Box marginTop={3} marginLeft={1}>
+                    <Typography variant='h2' component='h1'>OLL Trainer</Typography>
+                    <Typography variant='body1' component='p'>
+                        Welcome to the OLL trainer!
+                        <br/><br/>OLL is a step in the CFOP speedcubing method 
+                        (<Link href='https://jperm.net/3x3/cfop'>CFOP</Link>). In OLL, you orient the last layer of pieces.
+                        <br/><br/>There are 57 different OLL cases. Select/deselect them on the left by clicking the images. You can select/deselect all cases/cases in different groups by clicking the headers.
+                        <br/><br/>Click the training buttons on the right to go into training mode!
+                        <br/><br/>Enjoy!<br/>Gabriel Shiu
+                        <br/><br/>GitHub repo: <Link href='https://github.com/s-leirbag/oll-trainer'>click</Link>
+                    </Typography>
+                </Box>
             {/* Case headers/tiles */}
             <table><tbody>
                 {topHeader}
                 {cases}
             </tbody></table>
             {/* Buttons to switch to the training modes: random/recap */}
-            <div className="train-buttons">
-                <h1>Train</h1>
-                <Button
-                    variant='contained'
-                    onClick={() => this.props.changeMode('random')}
-                    title='Train selected cases randomly'
-                >
-                    Random mode
-                </Button>
-                <p>
-                    Gives you random cases from your selection.
-                </p>
-                <Button
-                    variant='contained'
-                    onClick={() => this.props.changeMode('recap')}
-                    title='Go through all the selected cases once'
-                >
-                    Recap mode
-                </Button>
-
-                <p>
-                    Goes through all the selected cases once.
-                </p>
-            </div>
-            </div>
+            <Button
+                variant='contained'
+                onClick={() => this.props.changeMode(this.props.trainMode)}
+                title='Train your selected cases'
+                size='large'
+                sx={{ fontSize: 50, position: 'fixed', top: 10, right: 10 }}
+            >
+                Train
+            </Button>
+            </Container>
         );
     }
 }

@@ -1,11 +1,47 @@
 import React from 'react';
 import "./Train.css";
-import { Button, ButtonGroup } from '@mui/material';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Typography from '@mui/material/Typography';
 import Timer from "../Timer/Timer.jsx";
 import { styleSettingNames, stylePresets } from '../../StylePresets';
 import { algsInfo, ollMap } from '../../Constants';
 import { msToReadable, logTabSep } from '../../Utils';
 import { clone, cloneDeep, sample, isEmpty, sortBy } from 'lodash';
+
+function ToggleButtons(props) {
+    const [mode, setMode] = React.useState(props.mode);
+
+    const handleMode = (event, newMode) => {
+        if (newMode !== null) {
+            setMode(newMode);
+            props.changeMode(newMode);
+        }
+    };
+  
+    return (
+      <>
+      <Typography>
+        Mode
+      </Typography>
+      <ToggleButtonGroup
+        value={mode}
+        exclusive
+        onChange={handleMode}
+        aria-label="mode"
+      >
+        <ToggleButton value="random" aria-label="random" title='Gives you random cases from your selection.'>
+          Random
+        </ToggleButton>
+        <ToggleButton value="recap" aria-label="recap" title='Goes through all the selected cases once.'>
+          Recap
+        </ToggleButton>
+      </ToggleButtonGroup>
+      </>
+    );
+}
 
 /**
  * Info box for cases
@@ -487,6 +523,13 @@ export default class Train extends React.Component {
         this.applyStyle(style);
     }
 
+    changeMode(newMode) {
+        this.props.changeMode(newMode);
+        this.setState({ mode: newMode });
+        if (newMode === 'recap')
+            this.setState({ recapArray: clone(this.state.selected) });
+    }
+
     /**
      * Display a hint box for a case
      * @param {number} i number of case to display a hint box for
@@ -595,20 +638,20 @@ export default class Train extends React.Component {
         const nSelected = this.state.selected.length;
         const currentEntry = this.state.currentEntry;
         
-        let selInfo, scramInfo, lastScramInfo;
+        let nCases, scramInfo, lastScramInfo;
 
-        // selInfo is the note at the top saying the mode and # of cases
+        // nCases is the note at the top saying the # of cases
         // scramInfo is the scramble
         if (nSelected > 0) {
             if (this.state.mode === 'random')
-                selInfo = " | random mode: " + nSelected + " cases selected";
+                nCases = nSelected + " cases selected";
             else if (this.state.mode === 'recap')
-                selInfo = " | recap mode: " + (this.state.recapArray.length + 0) + " cases left";
+                nCases = (this.state.recapArray.length + 0) + " cases left";
             // currentEntry is null on the first frame
             if (currentEntry)
                 scramInfo = "scramble: " + currentEntry.scramble;
         } else {
-            selInfo = "";
+            nCases = "";
             scramInfo = "click \"select cases\" above and pick some OLLs to practice";
         }
 
@@ -617,7 +660,7 @@ export default class Train extends React.Component {
         if (!isEmpty(times) && lastCase !== -1) {
             let button = "";
             if (this.state.selected.includes(lastCase))
-                button = <Button variant='contained' onClick={() => this.confirmUnsel(lastCase)} key={style.buttonColor}>Unselect</Button>;
+                button = <Button variant='outline' onClick={() => this.confirmUnsel(lastCase)} key={style.buttonColor}>Unselect</Button>;
             lastScramInfo = (
                 <div>
                     Last Scramble: {this.state.lastEntry.scramble + ' (' + algsInfo[lastCase]['name'] + ')'}
@@ -626,6 +669,7 @@ export default class Train extends React.Component {
             );
         }
 
+        logTabSep('props', this.props.mode, 'state:', this.state.mode);
         return (
             <div className='train'>
             <table id='mainTable'><tbody>
@@ -633,12 +677,16 @@ export default class Train extends React.Component {
                     <Button
                         variant='contained'
                         id='selectBtn'
-                        onClick={() => this.props.changeMode('caseselect')}
+                        onClick={() => this.changeMode('caseselect')}
                         key={style.buttonColor}
                     >
                         Select Cases
                     </Button>
-                    {selInfo}
+                    {nCases}
+                    <ToggleButtons
+                        mode={this.state.mode}
+                        changeMode={(newMode) => this.changeMode(newMode)}
+                    />
                 </td></tr>
                 <tr><td id="scramble" colSpan="2" style={{ fontSize: sizes['scramble'] }} >{scramInfo}</td></tr>
                 <tr>

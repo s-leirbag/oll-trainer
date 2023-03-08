@@ -7,6 +7,7 @@ import CaseSelect from './Components/CaseSelect/CaseSelect.jsx';
 import Train from './Components/Train/Train.jsx';
 // import { logTabSep } from './Utils';
 import { clone } from 'lodash';
+import { logTabSep } from './Utils';
 // import { algsGroups, renderGroups, algsInfo } from './Constants';
 
 /**
@@ -62,6 +63,7 @@ export default class App extends React.Component {
       // Random is training page with random cases given
       // Recap is training page going through each case once
       mode: 'caseselect', // caseselect, random, recap
+      trainMode: 'random', // training mode (random/recap)
       selected: [], // selected cases in the form of case number
       times: [], // stat entries from previously timed cases in training
       lastEntry: {}, // entry from last case timed in training
@@ -161,6 +163,8 @@ export default class App extends React.Component {
    */
   changeMode(mode) {
     this.setState({ mode: mode });
+    if (mode === 'random' || mode === 'recap')
+      this.setState({ trainMode: mode });
   }
 
   /**
@@ -177,12 +181,14 @@ export default class App extends React.Component {
         <CaseSelect
           selected={this.state.selected}
           saveSelection={(selected) => this.saveSelection(selected)}
+          trainMode={this.state.trainMode}
           changeMode={(mode) => this.changeMode(mode)}
           styleSettings={this.state.style}
         />
       );
     // Component Train is the training/timing page for mode random or recap
     } else {
+      logTabSep("app", this.state.mode);
       app = (
         <Train
           selected={this.state.selected}
