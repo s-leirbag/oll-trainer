@@ -82,7 +82,7 @@ export default class Stats extends React.Component {
                 </Box>
 
                 <Typography sx={{ }} variant='body1' component='p'>
-                    Click case names for case info.<br/>Click times to remove times.
+                    Click cases for case info.<br/>Click times to remove times.
                 </Typography>
             </Box>
         )

@@ -186,6 +186,7 @@ export default class App extends React.Component {
           trainMode={this.state.trainMode}
           changeMode={(mode) => this.changeMode(mode)}
           styleSettings={this.state.style}
+          key={this.state.selected}
         />
       );
     // Component Train is the training/timing page for mode random or recap

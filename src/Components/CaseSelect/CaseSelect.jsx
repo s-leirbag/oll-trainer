@@ -7,6 +7,7 @@ import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { algsGroups, renderGroups, algsInfo } from '../../Constants';
+import { logTabSep } from '../../Utils';
 
 /**
  * Clickable tile of a case
@@ -222,7 +223,7 @@ export default class CaseSelect extends React.Component {
                 {topHeader}
                 {cases}
             </tbody></table>
-            {/* Buttons to switch to the training modes: random/recap */}
+            {/* Button to switch to the training page */}
             <Button
                 variant='contained'
                 onClick={() => this.props.changeMode(this.props.trainMode)}

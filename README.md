@@ -8,13 +8,8 @@ It is heavily based on https://github.com/Roman-/oll_trainer by Roman Strakhov b
 
 ## To-do
 
-- scramble/timer size, mui, clean, typescript
-
 - Use Typescript
-- Improve stats list
 - Clean code, comment, refactor
-- Customize timer/scramble size
-- Fix selected cases not highlighting when site is first loaded
 
 ## Credits
 
