@@ -1,6 +1,8 @@
-export const styleSettingNames = ['accent',  'accentColor', 'mode', 'primary'];
+export const styleSettingNames = ['timerFontSize', 'scrambleFontSize', 'accent',  'accentColor', 'mode', 'primary'];
 
 export const defaultStyle = {
+    timerFontSize: '8rem',
+    scrambleFontSize: '1.5rem',
     accent: 'yellow',
     accentColor: '#fdfae3',
     mode: 'dark',

@@ -1,3 +1,14 @@
+export function logTabSep() {
+    console.log(Array.prototype.slice.call(arguments).join('\t>'));
+}
+
+/**
+ * Convert time to a readable form
+ * With minutes/seconds/ms separated by a colon and period
+ * Minutes show only if the time is above 60 seconds
+ * @param {Number} time in ms
+ * @returns time in a human readable form
+ */
 export function msToReadable(time) {
     let minutes = "";
     if (time >= 60000)
@@ -6,10 +17,6 @@ export function msToReadable(time) {
     const seconds = ("0" + Math.floor((time / 1000) % 60)).slice((time >= 10000) ? -2 : -1) + ".";
     const ms = ("0" + Math.floor((time / 10) % 100)).slice(-2);
     return minutes + seconds + ms;
-}
-
-export function logTabSep() {
-    console.log(Array.prototype.slice.call(arguments).join('\t>'));
 }
 
 /**
@@ -44,4 +51,15 @@ export function inverseScramble(s) {
     }
 
     return result.substring(0, result.length-1);
+}
+
+/**
+ * Increment a string specifying rem units
+ * @param {String} rem Initial rem value
+ * @param {Number} increment Increment (should be positive/negative)
+ */
+export function incrementRem(rem, increment) {
+    rem = Number(rem.slice(0, -3));
+    rem += increment;
+    return String(rem).concat('rem');
 }

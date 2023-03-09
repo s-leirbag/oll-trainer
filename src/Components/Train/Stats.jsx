@@ -126,7 +126,7 @@ export default class Stats extends React.Component {
                 <Box sx={{ height: '100%', p: 2 }}>
                     {this.renderHeader()}
 
-                    <Paper sx={{ height: '85%' }} elevation={1}>
+                    <Paper sx={{ height: '85%' }} elevation={2}>
                     <TableContainer sx={{ height: '100%', display: 'flex' }}>
                         <Table size='small' stickyHeader aria-label="sticky table">
                         <TableHead>

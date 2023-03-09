@@ -208,7 +208,21 @@ export default class App extends React.Component {
     const style = this.state.style;
 
     const theme = createTheme({
-      palette: style
+      palette: style,
+      typography: {
+        timer: {
+          fontWeight: 300,
+          fontSize: style.timerFontSize,
+          lineHeight: 1.167,
+          letterSpacing: "-0.01562em",
+        },
+        scramble: {
+          fontWeight: 400,
+          fontSize: style.scrambleFontSize,
+          lineHeight: 1.334,
+          letterSpacing: "0em",
+        }
+      }
     })
 
     // Leave Easter egg button on both selection and training pages

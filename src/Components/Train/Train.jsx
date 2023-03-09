@@ -15,7 +15,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
 import { clone, cloneDeep, sample, isEmpty } from 'lodash';
-import { msToReadable, inverseScramble, logTabSep } from '../../Utils';
+import { msToReadable, inverseScramble, incrementRem, logTabSep } from '../../Utils';
 
 /**
  * A UI setting with its name and two buttons
@@ -23,20 +23,11 @@ import { msToReadable, inverseScramble, logTabSep } from '../../Utils';
 function SettingButtons(props) {
     let buttons = [];
     for (const [name, onClick] of Object.entries(props.map)) {
-        if (props.name === 'Timer' || props.name === 'Scramble') {
-            buttons.push(
-                <Button disabled onClick={() => onClick()} key={name}>
-                    {name}
-                </Button>
-            );
-        }
-        else {
-            buttons.push(
-                <Button onClick={() => onClick()} key={name}>
-                    {name}
-                </Button>
-            );
-        }
+        buttons.push(
+            <Button onClick={() => onClick()} key={name}>
+                {name}
+            </Button>
+        );
     }
 
     return (
@@ -280,7 +271,7 @@ export default class Train extends React.Component {
      * @param {Object} newStyle 
      */
     applyStyle(newStyle) {
-        let style = this.state.styleSettings;
+        let style = clone(this.state.styleSettings);
 
         for (const propertyName of styleSettingNames) {
             if (newStyle.hasOwnProperty(propertyName))
@@ -307,9 +298,14 @@ export default class Train extends React.Component {
      * @param {number} increment 
      */
     adjustSize(element, increment) {
-        let sizes = this.state.sizes;
-        sizes[element] += increment;
-        this.setState({ sizes: sizes });
+        if (element === 'timer') {
+            let timerFontSize = this.state.styleSettings.timerFontSize;
+            this.applyStyle({ timerFontSize: incrementRem(timerFontSize, increment) });
+        }
+        else if (element === 'scramble') {
+            let scrambleFontSize = this.state.styleSettings.scrambleFontSize;
+            this.applyStyle({ scrambleFontSize: incrementRem(scrambleFontSize, increment) });
+        }
     }
 
     /**
@@ -346,12 +342,12 @@ export default class Train extends React.Component {
     renderSettings() {
         const settings = {
             'Timer': {
-                '+': () => this.adjustSize('timer', 16),
-                '-': () => this.adjustSize('timer', -16)
+                '+': () => this.adjustSize('timer', 1),
+                '-': () => this.adjustSize('timer', -1),
             },
             'Scramble': {
-                '+': () => this.adjustSize('scramble', 8),
-                '-': () => this.adjustSize('scramble', -8)
+                '+': () => this.adjustSize('scramble', 0.2),
+                '-': () => this.adjustSize('scramble', -0.2),
             },
             'Theme': {
                 '☀️': () => this.setTheme('light'),
@@ -438,7 +434,7 @@ export default class Train extends React.Component {
                 <Grid item xs={8}>
                     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <Paper elevation={4}>
-                            <Typography p={1} variant='h5' component='h5'>
+                            <Typography px={1} variant='scramble'>
                                 {scramble}
                             </Typography>
                         </Paper>

@@ -98,7 +98,7 @@ export default class Timer extends React.Component {
                 }}
                 elevation={4}
             >
-                <Typography variant='h1' component='h1'>
+                <Typography variant='timer'>
                     {msToReadable(time)}
                 </Typography>
                 <Typography variant='body1' component='p'>
