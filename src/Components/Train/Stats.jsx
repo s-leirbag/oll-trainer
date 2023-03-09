@@ -20,8 +20,7 @@ import { sortBy } from 'lodash';
  * Column info for stats table
  */
 const columns = [
-    { id: 'caseName', label: 'Case' },
-    { id: 'average', label: 'Avg' },
+    { id: 'caseName', label: 'Case', width: 80 },
     { id: 'timesList', label: 'Times' },
 ];
 
@@ -47,11 +46,19 @@ function TimesGroup(props) {
         )
     }
 
-    // const caseName = algsInfo[props.caseNum]["name"];
     const average = msToReadable(sum / props.caseTimes.length);
-    const caseName = <CaseModal i={props.caseNum}/>
 
-    return { caseName, average, timesList };
+    return {
+        caseName: <CaseModal i={props.caseNum} confirmUnsel={props.confirmUnsel} />,
+        timesList: (
+            <Box sx={{ ml: 1.5 }}>
+                <Typography variant='body1' component='body1'>
+                    {average} average<br/>
+                    {timesList}
+                </Typography>
+            </Box>
+        )
+    };
 }
 
 /**
@@ -75,20 +82,17 @@ export default class Stats extends React.Component {
         return resultsByCase;
     }
 
-    hi() {
-        console.log("hi");
-    }
-
     render() {
         const resultsByCase = this.getResultsByCase(this.props.times);
-        const keys = sortBy(Object.keys(resultsByCase).map(Number));
+        const caseNums = sortBy(Object.keys(resultsByCase).map(Number));
 
         let groupsList = [];
-        for (const i of keys) {
+        for (const i of caseNums) {
+            const confirmUnsel = this.props.selected.includes(i) ? () => this.props.confirmUnsel(i) : null;
             groupsList.push(
                 TimesGroup({
-                    displayBox: () => this.props.displayBox(i),
-                    confirmRem: (i) => this.props.confirmRem(i),
+                    confirmRem: (entry) => this.props.confirmRem(entry),
+                    confirmUnsel: confirmUnsel,
                     caseTimes: resultsByCase[i],
                     caseNum: i,
                     lastEntry: this.props.lastEntry
@@ -121,7 +125,7 @@ export default class Stats extends React.Component {
                                 <TableCell
                                 key={column.id}
                                 align={column.align}
-                                // style={{ minWidth: column.minWidth }}
+                                style={{ width: column.width }}
                                 >
                                 {column.label}
                                 </TableCell>
@@ -137,7 +141,7 @@ export default class Stats extends React.Component {
                                     {columns.map((column) => {
                                     const value = group[column.id];
                                     return (
-                                        <TableCell key={column.id} align={column.align}>
+                                        <TableCell key={column.id} align={column.align} sx={{ p: 0 }}>
                                         {value}
                                         </TableCell>
                                     );
@@ -145,7 +149,6 @@ export default class Stats extends React.Component {
                                 </TableRow>
                                 );
                             })}
-                            {/* {groupsList} */}
                         </TableBody>
                         </Table>
                     </TableContainer>

@@ -31,10 +31,28 @@ export default function CaseModal(props) {
     const name = algsInfo[i]["name"];
     const alg1 = algsInfo[i]["a"];
     const alg2 = algsInfo[i]["a2"];
+
+    let altAlg = '';
+    if (alg2 !== "") {
+      altAlg = (
+        <Typography>
+          Alternative:<br/>
+          {alg2}
+        </Typography>
+      );
+    }
   
+    let unselButton = "";
+    if (props.confirmUnsel)
+      unselButton = (
+        <Button sx={{ ml: 0 }} variant='outlined' onClick={props.confirmUnsel}>
+          Unselect
+        </Button>
+    );
+
     return (
       <div>
-        <Button sx={{ textAlign: 'left', justifyContent: 'left' }} variant='text' onClick={handleOpen} color='inherit'>
+        <Button sx={{ p: 0.5, textAlign: 'left', justifyContent: 'left' }} variant='text' onClick={handleOpen} color='inherit'>
           <img height={80} src={"pic/" + i + ".svg"} alt={name}/>
           {/* {name} */}
         </Button>
@@ -45,19 +63,22 @@ export default function CaseModal(props) {
           aria-describedby={'info for ' + name + ' case'}
         >
           <Box sx={style}>
-            <img width='200' src={"pic/" + i + ".svg"} alt={name}/>
-            <Typography id="modal-modal-title" variant="h4" component="h2">
-              #{i} {name}
-            </Typography>
-            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              Algorithm:<br/>
-              {alg1}
-              {alg2 !== "" ? <><br/>{alg2}</> : ""}
-            </Typography>
-            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-              Setup:<br/>
-              {inverseScramble(alg1)/* ollMap[i][0] */}
-            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <img width='200' src={"pic/" + i + ".svg"} alt={name}/>
+              <Typography variant="h4" component="h2">
+                #{i} {name}
+              </Typography>
+              <Typography>
+                Algorithm:<br/>
+                {alg1}
+              </Typography>
+              {altAlg}
+              <Typography>
+                Setup:<br/>
+                {inverseScramble(alg1)/* ollMap[i][0] */}
+              </Typography>
+              {unselButton}
+            </Box>
           </Box>
         </Modal>
       </div>

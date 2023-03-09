@@ -5,7 +5,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { styleSettingNames, defaultStyle } from './StylePresets.js';
 
-import Egg from './Components/Button/Egg.jsx'
+import Egg from './Components/Egg/Egg.jsx'
 import CaseSelect from './Components/CaseSelect/CaseSelect.jsx';
 import Train from './Components/Train/Train.jsx';
 
@@ -217,7 +217,7 @@ export default class App extends React.Component {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {app}
-        {/* <Egg styleSettings={style}/> */}
+        <Egg />
       </ThemeProvider>
       </div>
     );

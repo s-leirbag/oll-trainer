@@ -523,7 +523,7 @@ export default class Train extends React.Component {
                             confirmRem={(i) => this.confirmRem(i)}
                             confirmClear={() => this.confirmClear()}
                             lastEntry={this.state.lastEntry}
-                            displayBox={(i) => this.displayBox(i)}
+                            selected={this.state.selected}
                         />
                         </Box>
                     </Box>

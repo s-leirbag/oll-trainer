@@ -1,39 +1,25 @@
 import React from 'react';
-import "./Egg.css";
-import Button from "./Button.jsx";
+// import './Egg.css';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
+import Typography from '@mui/material/Typography';
 import { clone } from 'lodash';
 
 /**
- * Popup window of hints for easter eggs
+ * Style for easter egg hints box
  */
-function EggHints(props) {
-    return (
-        <div>
-            <table id="eggWindow" style={{backgroundColor: props.styleSettings.backgroundColor}}><tbody>
-                <tr>
-                    {/* Click on egg image quickly to break it as an easter egg */}
-                    <td
-                        rowSpan='2'
-                        style={{backgroundColor: props.styleSettings.accentColor}}
-                        onClick={props.onEggClick}
-                    >
-                        <img id='eggImg' src={props.img} alt='egg'/>
-                    </td>
-                    <td id='eggTitle'><h1>Easter Eggs</h1></td>
-                </tr>
-                <tr><td>
-                    {/* List of easter eggs */}
-                    Click Mr. Egg too fast
-                    <br/>Solve very slow/very fast {"(not done yet)"}
-                    <br/>Easter Egg 3
-                    <br/>Easter Egg 4
-                    <br/>Easter Egg 5
-                </td></tr>
-            </tbody></table>
-            <div id="eggWindowBack" onClick={() => props.hide()}></div>
-        </div>
-    );
-}
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
 
 // Click with less than CRACK_TIME_THRESHOLD ms between each click to break the egg
 const CRACK_TIME_THRESHOLD = 800;
@@ -49,11 +35,14 @@ const IMAGE_INDEX = {
     2: 'egg/egg-e.svg',
 }
 
+/**
+ * Easter eggs button and modal
+ */
 export default class Egg extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            eggHintsDisplayed: false,
+            isOpen: false,
             clickTimes: [], // Holds list of times between clicks on eggs
             lastClickTime: (new Date()).getTime(), // Time of last click on egg
             crackLevel: 0, // Corresponds to egg image. 0 1 2
@@ -65,8 +54,8 @@ export default class Egg extends React.Component {
      * Show/hide egg hint box
      * @param {boolean} val 
      */
-    setEggHintVisibility(val) {
-        this.setState({ eggHintsDisplayed: val });
+    setOpen(val) {
+        this.setState({ isOpen: val });
     }
 
     /**
@@ -78,8 +67,11 @@ export default class Egg extends React.Component {
             this.setState({ img: IMAGE_INDEX[0] });
     }
 
+    /**
+     * Handle clicking the egg button. Opens the modal and tracks the egg click.
+     */
     handleOnClick() {
-        this.setEggHintVisibility(true);
+        this.setOpen(true);
         this.onEggClick();
     }
 
@@ -88,10 +80,9 @@ export default class Egg extends React.Component {
      * Update the crack times/level/image accordingly
      */
     onEggClick() {
-        if (this.state.crackLevel === 2) {
-            // alert('You killed Mr. Egg...');
+        // Don't allow further cracking after crack level 2
+        if (this.state.crackLevel === 2)
             return;
-        }
 
         // Store duration since last click
         const clickTime = (new Date()).getTime();
@@ -138,37 +129,41 @@ export default class Egg extends React.Component {
     }
 
     /**
-     * Render egg hint box
-     */
-    renderEggHints() {
-        let hints = "";
-        if (this.state.eggHintsDisplayed) {
-            hints = (
-                <EggHints
-                    hide={() => this.setEggHintVisibility(false)} 
-                    styleSettings={this.props.styleSettings}
-                    img={this.state.img}
-                    onEggClick={() => this.onEggClick()}
-                />
-            );
-        }
-        return hints;
-    }
-
-    /**
-     * Render egg button and hint box if displayed
+     * Render egg button and hint modal if open
      */
     render() {
-        const eggHints = this.renderEggHints();
         return (
-            <div id="egg">
+            <div>
                 <Button
-                    name={<img width='100px' src={IMAGE_INDEX[this.state.crackLevel]} alt='egg'/>}
+                    variant='contained'
                     onClick={() => this.handleOnClick()}
-                    title='easter egg'
-                    styleSettings={this.props.styleSettings}
-                />
-                {eggHints}
+                    size='large'
+                    sx={{ p: 1, position: 'fixed', bottom: 10, right: 10 }}
+                >
+                    <img width={100} src={IMAGE_INDEX[this.state.crackLevel]} alt='egg'/>
+                </Button>
+                <Modal
+                    open={this.state.isOpen}
+                    onClose={() => this.setOpen(false)}
+                    aria-labelledby='easter egg'
+                    aria-describedby='easter egg hints'
+                >
+                    <Box sx={style}>
+                        {/* Click on egg image quickly to break it as an easter egg */}
+                        <img onClick={() => this.onEggClick()} width={150} src={this.state.img} alt='egg'/>
+                        <Typography variant="h4" component="h2">
+                            Easter Eggs
+                        </Typography>
+                        <Typography variant="body1" component="p" sx={{ mt: 2 }}>
+                            {/* List of easter eggs */}
+                            Click Mr. Egg too fast
+                            <br/>Solve very slow/very fast {"(not done yet)"}
+                            <br/>Easter Egg 3
+                            <br/>Easter Egg 4
+                            <br/>Easter Egg 5
+                        </Typography>
+                    </Box>
+                </Modal>
             </div>
         );
     }

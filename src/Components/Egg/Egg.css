@@ -1,16 +1,7 @@
-#egg {
+/* #egg {
     position: fixed;
     right: 2px;
     bottom: 2px;
-  }
-  
-  /*popup box with egg picture and info*/
-  #eggImg {
-      width: 150px;
-  }
-  
-  #eggTitle {
-      font-weight: bold;
   }
   
   #eggWindowBack {
@@ -26,11 +17,11 @@
   }
   
   #eggWindow {
-      /*-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;*/
+      -moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;
       position: fixed;
       z-index: 20;
       top: 40%;
       left: 50%;
       -webkit-transform: translate(-50%, -50%);
       transform: translate(-50%, -50%);
-  }
+  } */
