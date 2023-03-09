@@ -1,12 +1,12 @@
 import React from 'react';
 import "./CaseSelect.css";
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container'
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import { algsGroups, renderGroups, algsInfo } from '../../Constants';
-import { clone } from 'lodash';
 
 /**
  * Clickable tile of a case
@@ -103,14 +103,16 @@ export default class CaseSelect extends React.Component {
         const style = this.props.styleSettings;
         
         // Highlight case if selected
-        const backgroundColor = this.state.selected.includes(i) ? style.accentColor : style.backgroundColor;
+        let bgCol
+        if (this.state.selected.includes(i))
+            bgCol = style.mode === 'light' ? style.primary.light : style.primary.main;
         
         return (
             <Case
                 key={i}
                 onClick={() => this.toggleCase(i)}
                 name={algsInfo[i]["name"]}
-                backgroundColor={backgroundColor}
+                backgroundColor={bgCol}
                 src={"pic/" + i + ".svg"}
             />
         );
@@ -182,8 +184,6 @@ export default class CaseSelect extends React.Component {
      * Render the case selection page
      */
     render() {
-        const style = this.props.styleSettings;
-
         // Header for all cases
         const topHeader = (
             <tr><GroupHeader
@@ -201,23 +201,18 @@ export default class CaseSelect extends React.Component {
         for (const group of renderGroups["normal"])
             cases = cases.concat(this.renderNormalGroup(group));
 
-        /**
-         * Button style for the buttons that change to the training modes, random/recap
-         */
-        // let trainButtonStyle = clone(style);
-        // trainButtonStyle.float = 'left';
-
         return (
+            <Paper>
             <Container maxWidth="sm">
                 {/* Text info at the top of the page */}
-                <Box marginTop={3} marginLeft={1}>
+                <Box py={3} ml={1}>
                     <Typography variant='h2' component='h1'>OLL Trainer</Typography>
                     <Typography variant='body1' component='p'>
                         Welcome to the OLL trainer!
                         <br/><br/>OLL is a step in the CFOP speedcubing method 
                         (<Link href='https://jperm.net/3x3/cfop'>CFOP</Link>). In OLL, you orient the last layer of pieces.
-                        <br/><br/>There are 57 different OLL cases. Select/deselect them on the left by clicking the images. You can select/deselect all cases/cases in different groups by clicking the headers.
-                        <br/><br/>Click the training buttons on the right to go into training mode!
+                        <br/><br/>There are 57 different OLL cases. Select/deselect them by clicking the images. You can select/deselect cases in groups by clicking the headers.
+                        <br/><br/>Click train to go into training mode!
                         <br/><br/>Enjoy!<br/>Gabriel Shiu
                         <br/><br/>GitHub repo: <Link href='https://github.com/s-leirbag/oll-trainer'>click</Link>
                     </Typography>
@@ -238,6 +233,7 @@ export default class CaseSelect extends React.Component {
                 Train
             </Button>
             </Container>
+            </Paper>
         );
     }
 }

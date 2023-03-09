@@ -34,7 +34,10 @@ export default function CaseModal(props) {
   
     return (
       <div>
-        <Button variant='text' onClick={handleOpen} color='inherit'>{name}</Button>
+        <Button sx={{ textAlign: 'left', justifyContent: 'left' }} variant='text' onClick={handleOpen} color='inherit'>
+          <img height={80} src={"pic/" + i + ".svg"} alt={name}/>
+          {/* {name} */}
+        </Button>
         <Modal
           open={open}
           onClose={handleClose}
@@ -42,8 +45,8 @@ export default function CaseModal(props) {
           aria-describedby={'info for ' + name + ' case'}
         >
           <Box sx={style}>
-            <img src={"pic/" + i + ".svg"} alt={name}/>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
+            <img width='200' src={"pic/" + i + ".svg"} alt={name}/>
+            <Typography id="modal-modal-title" variant="h4" component="h2">
               #{i} {name}
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2 }}>

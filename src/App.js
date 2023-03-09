@@ -1,14 +1,16 @@
 import React from 'react';
 import './App.css';
+
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { styleSettingNames, defaultPreset, stylePresets } from './StylePresets.js';
+import { styleSettingNames, defaultStyle } from './StylePresets.js';
+
 import Egg from './Components/Button/Egg.jsx'
 import CaseSelect from './Components/CaseSelect/CaseSelect.jsx';
 import Train from './Components/Train/Train.jsx';
-// import { logTabSep } from './Utils';
+
 import { clone } from 'lodash';
 import { logTabSep } from './Utils';
-// import { algsGroups, renderGroups, algsInfo } from './Constants';
 
 /**
  * Save a value to local storage
@@ -67,7 +69,7 @@ export default class App extends React.Component {
       selected: [], // selected cases in the form of case number
       times: [], // stat entries from previously timed cases in training
       lastEntry: {}, // entry from last case timed in training
-      style: clone(stylePresets[defaultPreset]), // tracks style settings for user
+      style: clone(defaultStyle), // tracks style settings for user
     };
   }
 
@@ -141,15 +143,15 @@ export default class App extends React.Component {
     }
 
     this.setState({ style: style })
-    saveLocal('style', JSON.stringify(style));
+    // saveLocal('style', JSON.stringify(style));
   }
   
   /**
    * Load style settings
    */
   loadStyle() {
-    const defaultStyle = clone(stylePresets[defaultPreset]);
-    let style = JSON.parse(loadLocal('style', JSON.stringify(defaultStyle)));
+    const defaultStyleeeee = clone(defaultStyle);
+    let style = JSON.parse(loadLocal('style', JSON.stringify(defaultStyleeeee)));
     this.saveStyle(style);
   }
 
@@ -205,17 +207,18 @@ export default class App extends React.Component {
 
     const style = this.state.style;
 
+    const theme = createTheme({
+      palette: style
+    })
+
     // Leave Easter egg button on both selection and training pages
     return (
-      <div className="App"
-        // style={{
-        //   backgroundColor: style.backgroundColor,
-        //   color: style.textColor,
-        // }}
-      >
+      <div className="App">
+      <ThemeProvider theme={theme}>
         <CssBaseline />
         {app}
         {/* <Egg styleSettings={style}/> */}
+      </ThemeProvider>
       </div>
     );
   }

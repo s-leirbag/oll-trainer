@@ -2,6 +2,7 @@ import React from 'react';
 
 import CaseModal from "./CaseModal.jsx";
 
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -15,10 +16,13 @@ import Typography from '@mui/material/Typography';
 import { msToReadable } from '../../Utils';
 import { sortBy } from 'lodash';
 
+/**
+ * Column info for stats table
+ */
 const columns = [
-    { id: 'caseName', label: 'Case', minWidth: 80 },
+    { id: 'caseName', label: 'Case' },
     { id: 'average', label: 'Avg' },
-    { id: 'timesList', label: 'Times', minWidth: 170 },
+    { id: 'timesList', label: 'Times' },
 ];
 
 /**
@@ -71,8 +75,11 @@ export default class Stats extends React.Component {
         return resultsByCase;
     }
 
+    hi() {
+        console.log("hi");
+    }
+
     render() {
-        const style = this.props.styleSettings;
         const resultsByCase = this.getResultsByCase(this.props.times);
         const keys = sortBy(Object.keys(resultsByCase).map(Number));
 
@@ -88,55 +95,62 @@ export default class Stats extends React.Component {
                 })
             );
         }
-          
-        return (
-            <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-                <Typography>
-                    {this.props.times.length} times
-                </Typography>
-                <Button variant='outline' onClick={() => this.props.confirmClear()} key={style.buttonColor}>
-                    Clear
-                </Button>
-                <Typography>
-                    Click case names for case info
-                    <br/>Click times to remove times
-                </Typography>
 
-                <TableContainer sx={{ maxHeight: 440 }}>
-                    <Table stickyHeader aria-label="sticky table">
-                    <TableHead>
-                        <TableRow>
-                        {columns.map((column) => (
-                            <TableCell
-                            key={column.id}
-                            align={column.align}
-                            style={{ minWidth: column.minWidth }}
-                            >
-                            {column.label}
-                            </TableCell>
-                        ))}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {groupsList
-                        .map((group, index) => {
-                            return (
-                            <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                                {columns.map((column) => {
-                                const value = group[column.id];
-                                return (
-                                    <TableCell key={column.id} align={column.align}>
-                                    {value}
-                                    </TableCell>
-                                );
-                                })}
+        return (
+            <Paper sx={{ height: '100%' }} elevation={4}>
+                <Box sx={{ height: '100%', p: 2 }}>
+                    <Box sx={{ height: '5%', display: 'inline-flex' }}>
+                        <Typography variant='h6' component='h6'>
+                            {this.props.times.length} times
+                        </Typography>
+                        <Button sx={{ ml: 2 }} variant='outlined' onClick={() => this.props.confirmClear()}>
+                            Clear
+                        </Button>
+                    </Box>
+
+                    <Typography sx={{ height: '10%' }} variant='body1' component='p'>
+                        Click case names for case info.<br/>Click times to remove times.
+                    </Typography>
+
+                    <Paper sx={{ height: '85%' }} elevation={1}>
+                    <TableContainer sx={{ height: '100%', display: 'flex' }}>
+                        <Table size='small' stickyHeader aria-label="sticky table">
+                        <TableHead>
+                            <TableRow>
+                            {columns.map((column) => (
+                                <TableCell
+                                key={column.id}
+                                align={column.align}
+                                // style={{ minWidth: column.minWidth }}
+                                >
+                                {column.label}
+                                </TableCell>
+                            ))}
                             </TableRow>
-                            );
-                        })}
-                        {/* {groupsList} */}
-                    </TableBody>
-                    </Table>
-                </TableContainer>
+                        </TableHead>
+                        
+                        <TableBody sx={{ overflow: 'auto' }}>
+                            {groupsList
+                            .map((group, index) => {
+                                return (
+                                <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                                    {columns.map((column) => {
+                                    const value = group[column.id];
+                                    return (
+                                        <TableCell key={column.id} align={column.align}>
+                                        {value}
+                                        </TableCell>
+                                    );
+                                    })}
+                                </TableRow>
+                                );
+                            })}
+                            {/* {groupsList} */}
+                        </TableBody>
+                        </Table>
+                    </TableContainer>
+                    </Paper>
+                </Box>
             </Paper>
         );
     }

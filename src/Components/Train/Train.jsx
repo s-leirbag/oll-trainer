@@ -9,17 +9,19 @@ import { algsInfo, ollMap } from '../../Constants';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 
+import { clone, cloneDeep, sample, isEmpty } from 'lodash';
 import { msToReadable, inverseScramble, logTabSep } from '../../Utils';
-import { clone, cloneDeep, sample, isEmpty, sortBy } from 'lodash';
 
-function ToggleButtons(props) {
+/**
+ * Toggle buttons to change between random/recap training modes
+ */
+function ToggleModeButtons(props) {
     const [mode, setMode] = React.useState(props.mode);
 
     const handleMode = (event, newMode) => {
@@ -30,24 +32,24 @@ function ToggleButtons(props) {
     };
   
     return (
-      <Paper sx={{ padding: 2, position: 'fixed', top: 10, right: 10 }}>
-      <Typography variant='h4' component='h4'>
-        Mode
-      </Typography>
-      <ToggleButtonGroup
-        value={mode}
-        exclusive
-        onChange={handleMode}
-        aria-label="mode"
-      >
-        <ToggleButton value="random" aria-label="random" title='Gives you random cases from your selection.'>
-          Random
-        </ToggleButton>
-        <ToggleButton value="recap" aria-label="recap" title='Goes through all the selected cases once.'>
-          Recap
-        </ToggleButton>
-      </ToggleButtonGroup>
-      </Paper>
+      <Box>
+        <Typography variant='h4' component='h4'>
+            Mode
+        </Typography>
+        <ToggleButtonGroup
+            value={mode}
+            exclusive
+            onChange={handleMode}
+            aria-label="mode"
+        >
+            <ToggleButton value="random" aria-label="random" title='Gives you random cases from your selection.'>
+            Random
+            </ToggleButton>
+            <ToggleButton value="recap" aria-label="recap" title='Goes through all the selected cases once.'>
+            Recap
+            </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
     );
 }
 
@@ -55,38 +57,33 @@ function ToggleButtons(props) {
  * A UI setting with its name and two buttons
  */
 function SettingButtons(props) {
-    return (
-        <div>
-            {props.name}
-            <ButtonGroup variant="outlined" aria-label="outlined button group">
-                <Button onClick={() => props.onClick1()}>
-                    {props.buttonName1}
+    let buttons = [];
+    for (const [name, onClick] of Object.entries(props.map)) {
+        if (props.name === 'Timer' || props.name === 'Scramble') {
+            buttons.push(
+                <Button disabled onClick={() => onClick()} key={name}>
+                    {name}
                 </Button>
-                <Button onClick={() => props.onClick2()}>
-                    {props.buttonName2}
+            );
+        }
+        else {
+            buttons.push(
+                <Button onClick={() => onClick()} key={name}>
+                    {name}
                 </Button>
-            </ButtonGroup>
-            <br/>
-        </div>
-    );
-}
+            );
+        }
+    }
 
-/**
- * A UI setting with its name and text input
- */
-function SettingInput(props) {
     return (
-        <label>
-            {props.name}
-            <input
-                className='settinginput'
-                type="text"
-                value={props.value}
-                onChange={props.onChange}
-                maxLength='7'
-                size='7'
-            />
-        </label>
+        <Box sx={{ p: 1 }}>
+            <Typography variant='body1' component='p'>
+                {props.name}
+            </Typography>
+            <ButtonGroup variant="outlined" aria-label="outlined button group">
+                {buttons}
+            </ButtonGroup>
+        </Box>
     );
 }
 
@@ -337,7 +334,7 @@ export default class Train extends React.Component {
      */
     // https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-controlled-component
     handleColorInputChange = (propertyName, event) => {
-        this.applyStyle({ [propertyName]: event.target.value });
+        // this.applyStyle({ [propertyName]: event.target.value });
     };
 
     /**
@@ -352,14 +349,25 @@ export default class Train extends React.Component {
     }
 
     /**
-     * Set the style settings to a preset
-     * @param {string} preset 
+     * Set the theme light/dark
+     * @param {string} newTheme 
      */
-    setStyle(preset) {
-        const style = stylePresets[preset];
-        this.applyStyle(style);
+    setTheme(newTheme) {
+        this.applyStyle(stylePresets[newTheme][this.state.styleSettings.accent]);
     }
 
+    /**
+     * Set the accent color
+     * @param {string} accent 
+     */
+    setAccent(accent) {
+        this.applyStyle(stylePresets[this.state.styleSettings.mode][accent]);
+    }
+
+    /**
+     * Change the trainig mode to random/recap
+     * @param {string} accent 
+     */
     changeMode(newMode) {
         this.props.changeMode(newMode);
         this.setState({ mode: newMode });
@@ -368,64 +376,43 @@ export default class Train extends React.Component {
     }
 
     /**
-     * Render a setting with buttons shorter using a function
-     */
-    renderSettingButtons(name, buttonName1, buttonName2, onClick1, onClick2, style, key) {
-        return (
-            <SettingButtons
-                name={name}
-                buttonName1={buttonName1}
-                buttonName2={buttonName2}
-                onClick1={onClick1}
-                onClick2={onClick2}
-                styleSettings={style}
-                key={key}
-            />
-        );
-    }
-
-    /**
-     * Render a setting with text input shorter using a function
-     */
-    renderSettingInput(name, value, onChange) {
-        return (
-            <SettingInput
-                name={name}
-                value={value}
-                onChange={onChange}
-            />
-        );
-    }
-
-    /**
-     * Render the settings buttons and text input at the bottom of the train page
+     * Render the customization setting buttons at the bottom of the train page
      * @returns jsx for settings
      */
     renderSettings() {
-        const style = this.state.styleSettings;
+        const settings = {
+            'Timer': {
+                '+': () => this.adjustSize('timer', 16),
+                '-': () => this.adjustSize('timer', -16)
+            },
+            'Scramble': {
+                '+': () => this.adjustSize('scramble', 8),
+                '-': () => this.adjustSize('scramble', -8)
+            },
+            'Theme': {
+                '☀️': () => this.setTheme('light'),
+                '🌙': () => this.setTheme('dark'),
+            },
+            'Accent': {
+                '🤍': () => this.setAccent('gray'),
+                '🍓': () => this.setAccent('red'),
+                '🍊': () => this.setAccent('orange'),
+                '🌻': () => this.setAccent('yellow'),
+                '🐸': () => this.setAccent('green'),
+                '🥶': () => this.setAccent('blue'),
+                '💜': () => this.setAccent('purple'),
+                '🌸': () => this.setAccent('pink'),
+            },
+        }
+
+        let settingButtons = [];
+        for (const [name, map] of Object.entries(settings))
+            settingButtons.push(<SettingButtons name={name} map={map} key={name}/>);
+        
         return (
-            <div>
-                {this.renderSettingButtons('Timer Size', '+', '-',
-                        () => this.adjustSize('timer', 16), () => this.adjustSize('timer', -16),
-                        style, 'timer' + style.buttonColor)}
-                {this.renderSettingButtons('Scramble Size', '+', '-',
-                        () => this.adjustSize('scramble', 8), () => this.adjustSize('scramble', -8),
-                        style, 'scramble' + style.buttonColor)}
-                {this.renderSettingButtons('Color Presets', 'Light', 'Dark',
-                        () => this.setStyle('light'), () => this.setStyle('dark'),
-                        style, 'presets' + style.buttonColor)}
-                <span>Specific Colors: </span>
-                {this.renderSettingInput('Background: ', style.backgroundColor,
-                        (event) => this.handleColorInputChange('backgroundColor', event))}
-                {this.renderSettingInput('Button: ', style.buttonColor,
-                        (event) => this.handleColorInputChange('buttonColor', event))}
-                {this.renderSettingInput('Text: ', style.textColor,
-                        (event) => this.handleColorInputChange('textColor', event))}
-                {/* {this.renderSettingInput('Link: ', style.linkColor,
-                        (event) => this.handleColorInputChange('linkColor', event))} */}
-                {this.renderSettingInput('Accent: ', style.accentColor,
-                        (event) => this.handleColorInputChange('accentColor', event))}
-            </div>
+            <Paper sx={{ display: 'inline-flex' }} elevation={4}>
+                {settingButtons}
+            </Paper>
         );
     }
 
@@ -441,21 +428,25 @@ export default class Train extends React.Component {
         const nSelected = this.state.selected.length;
         const currentEntry = this.state.currentEntry;
         
-        let nCases, scramInfo, lastScramInfo;
+        let nCases, nCasesText, scramble, lastScramInfo;
 
         // nCases is the note at the top saying the # of cases
-        // scramInfo is the scramble
         if (nSelected > 0) {
-            if (this.state.mode === 'random')
-                nCases = nSelected + " cases selected";
-            else if (this.state.mode === 'recap')
-                nCases = (this.state.recapArray.length + 0) + " cases left";
+            if (this.state.mode === 'random') {
+                nCases = nSelected;
+                nCasesText = ' cases selected';
+            }
+            else if (this.state.mode === 'recap') {
+                nCases = (this.state.recapArray.length + 0);
+                nCasesText = ' cases left';
+            }
             // currentEntry is null on the first frame
             if (currentEntry)
-                scramInfo = "scramble: " + currentEntry.scramble;
+                scramble = "scramble: " + currentEntry.scramble;
         } else {
-            nCases = "";
-            scramInfo = "click \"select cases\" above and pick some OLLs to practice";
+            nCases = 0;
+            nCasesText = ' cases selected';
+            scramble = "click \"select cases\" above and pick some OLLs to practice";
         }
 
         // Display the last scramble if applicable, and a button to remove it from the selection of cases
@@ -463,111 +454,81 @@ export default class Train extends React.Component {
         if (!isEmpty(times) && lastCase !== -1) {
             let button = "";
             if (this.state.selected.includes(lastCase))
-                button = <Button variant='outline' onClick={() => this.confirmUnsel(lastCase)} key={style.buttonColor}>Unselect</Button>;
+                button = (
+                    <Button sx={{ ml: 2 }} variant='outlined' onClick={() => this.confirmUnsel(lastCase)}>
+                        Unselect
+                    </Button>
+                );
             lastScramInfo = (
-                <div>
+                <Paper sx={{ p: 1 }} elevation={4}>
+                <Typography variant='h6' component='h6'>
                     Last Scramble: {this.state.lastEntry.scramble + ' (' + algsInfo[lastCase]['name'] + ')'}
                     {button}
-                </div>
+                </Typography>
+                </Paper>
             );
         }
 
         return (
-            <Container maxWidth="lg" sx={{ display: 'inline' }}>
-                <Box sx={{ flexGrow: 1 }}>
-                <Grid container spacing={2}>
-                    <Grid item xs={4}>
+            <Grid container columnSpacing={2} sx={{ p: 2, height: '100vh' }}>
+                <Grid item xs={8}>
+                    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <Paper elevation={4}>
+                            <Typography p={1} variant='h5' component='h5'>
+                                {scramble}
+                            </Typography>
+                        </Paper>
+
+                        <Timer
+                            isActive={nSelected > 0}
+                            onTimerEnd={time => this.handleTimerEnd(time)}
+                            prepColor={style.accentColor}
+                            fontSize={sizes['timer']}
+                        />
+
+                        {this.renderSettings()}
+                        {lastScramInfo}
+                    </Box>
+                </Grid>
+                
+                <Grid item xs={4} sx={{ height: '100%' }}>
+                    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <Paper sx={{ height: '15%', p: 2, display: 'inline-flex' }} elevation={2}>
+                            <ToggleModeButtons
+                                mode={this.state.mode}
+                                changeMode={(newMode) => this.changeMode(newMode)}
+                            />
+                            <Box sx={{ ml: 2 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'end' }}>
+                                    <Typography variant='h4' component='h4'>
+                                        {nCases}
+                                    </Typography>
+                                    <Typography sx={{ ml: 1 }} variant='h6' component='h6'>
+                                        {nCasesText}
+                                    </Typography>
+                                </Box>
+
+                                <Button
+                                    variant='contained'
+                                    onClick={() => this.changeMode('caseselect')}
+                                >
+                                    Select Cases
+                                </Button>
+                            </Box>
+                        </Paper>
+
+                        <Box sx={{ height: '83%' }}>
                         <Stats
                             times={times}
                             confirmRem={(i) => this.confirmRem(i)}
                             confirmClear={() => this.confirmClear()}
                             lastEntry={this.state.lastEntry}
                             displayBox={(i) => this.displayBox(i)}
-                            styleSettings={style}
                         />
-                    </Grid>
-                    <Grid item xs={8}>
-                        <Box>
-                            <Typography variant='h5' component='h5'>
-                                {scramInfo} {/*style={{ fontSize: sizes['scramble'] }} */}
-                            </Typography>
-                            <Timer
-                                isActive={nSelected > 0}
-                                onTimerEnd={time => this.handleTimerEnd(time)}
-                                regularColor={style.textColor}
-                                prepColor={style.accentColor}
-                                fontSize={sizes['timer']}
-                            />
                         </Box>
-                    </Grid>
+                    </Box>
                 </Grid>
-                </Box>
-
-                <Paper sx={{ padding: 2, position: 'fixed', top: 200, right: 10 }}>
-                    <Button
-                        variant='contained'
-                        onClick={() => this.changeMode('caseselect')}
-                        key={style.buttonColor}
-                    >
-                        Select Cases
-                    </Button>
-                    {nCases}
-                </Paper>
-                    <ToggleButtons
-                        mode={this.state.mode}
-                        changeMode={(newMode) => this.changeMode(newMode)}
-                    />
-                        {this.renderSettings()}
-                        {lastScramInfo}
-            </Container>
+            </Grid>
         )
-
-        // (
-        //     <Container maxWidth="lg">
-        //     <table id='mainTable'><tbody>
-        //         <tr><td colSpan='2'>
-        //             <Button
-        //                 variant='contained'
-        //                 id='selectBtn'
-        //                 onClick={() => this.changeMode('caseselect')}
-        //                 key={style.buttonColor}
-        //             >
-        //                 Select Cases
-        //             </Button>
-        //             {nCases}
-        //             <ToggleButtons
-        //                 mode={this.state.mode}
-        //                 changeMode={(newMode) => this.changeMode(newMode)}
-        //             />
-        //         </td></tr>
-        //         <tr><td id="scramble" colSpan="2" style={{ fontSize: sizes['scramble'] }} >{scramInfo}</td></tr>
-        //         <tr>
-        //             <td id="timer">
-        //                 <Timer
-        //                     isActive={nSelected > 0}
-        //                     onTimerEnd={time => this.handleTimerEnd(time)}
-        //                     regularColor={style.textColor}
-        //                     prepColor={style.accentColor}
-        //                     fontSize={sizes['timer']}
-        //                 />
-        //             </td>
-        //             <Stats
-        //                 times={times}
-        //                 confirmRem={(i) => this.confirmRem(i)}
-        //                 confirmClear={() => this.confirmClear()}
-        //                 lastEntry={this.state.lastEntry}
-        //                 displayBox={(i) => this.displayBox(i)}
-        //                 styleSettings={style}
-        //             />
-        //         </tr>
-        //         <tr>
-        //             <td colSpan="2">
-        //                 {this.renderSettings()}
-        //                 {lastScramInfo}
-        //             </td>
-        //         </tr>
-        //     </tbody></table>
-        //     </Container>
-        // )
     }
 }

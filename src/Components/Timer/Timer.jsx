@@ -1,6 +1,9 @@
 import React from 'react';
-import "./Timer.css";
+// import "./Timer.css";
 import { msToReadable } from '../../Utils';
+
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 
 /**
  * Timer component of training page
@@ -79,18 +82,29 @@ export default class Timer extends React.Component {
         const stage = this.state.stage;
 
         // Highlight the text color when the timer is primed/prepped
-        let color = stage === "prep" ? this.props.prepColor : this.props.regularColor;
+        let color = stage === "prep" ? this.props.prepColor : null;
         
         return (
-            <div
-                className="timer"
-                style={{ fontSize: this.props.fontSize }}
+
+            <Paper
+                sx={{
+                    color: color,
+                    height: '100%',
+                    display: 'flex',
+                    flex: '1 1 auto',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}
+                elevation={4}
             >
-                <div className='timerContents'>
-                    <span style={{ color: color }}>{msToReadable(time)}</span>
-                    <p style={{ fontSize: '16px' }}>Press space to start/stop the timer</p>
-                </div>
-            </div>
+                <Typography variant='h1' component='h1'>
+                    {msToReadable(time)}
+                </Typography>
+                <Typography variant='body1' component='p'>
+                    [space] to start/stop
+                </Typography>
+            </Paper>
         )
     }
 }
