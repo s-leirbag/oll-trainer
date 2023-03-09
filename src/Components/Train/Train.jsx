@@ -1,6 +1,7 @@
 import React from 'react';
 
 import "./Train.css";
+import ModeButtons from "./ModeButtons.jsx";
 import Stats from "./Stats.jsx";
 import Timer from "../Timer/Timer.jsx";
 import { styleSettingNames, stylePresets } from '../../StylePresets';
@@ -11,47 +12,10 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 
 import { clone, cloneDeep, sample, isEmpty } from 'lodash';
 import { msToReadable, inverseScramble, logTabSep } from '../../Utils';
-
-/**
- * Toggle buttons to change between random/recap training modes
- */
-function ToggleModeButtons(props) {
-    const [mode, setMode] = React.useState(props.mode);
-
-    const handleMode = (event, newMode) => {
-        if (newMode !== null) {
-            setMode(newMode);
-            props.changeMode(newMode);
-        }
-    };
-  
-    return (
-      <Box>
-        <Typography variant='h4' component='h4'>
-            Mode
-        </Typography>
-        <ToggleButtonGroup
-            value={mode}
-            exclusive
-            onChange={handleMode}
-            aria-label="mode"
-        >
-            <ToggleButton value="random" aria-label="random" title='Gives you random cases from your selection.'>
-            Random
-            </ToggleButton>
-            <ToggleButton value="recap" aria-label="recap" title='Goes through all the selected cases once.'>
-            Recap
-            </ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
-    );
-}
 
 /**
  * A UI setting with its name and two buttons
@@ -494,7 +458,7 @@ export default class Train extends React.Component {
                 <Grid item xs={4} sx={{ height: '100%' }}>
                     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <Paper sx={{ height: '15%', p: 2, display: 'inline-flex' }} elevation={2}>
-                            <ToggleModeButtons
+                            <ModeButtons
                                 mode={this.state.mode}
                                 changeMode={(newMode) => this.changeMode(newMode)}
                             />
@@ -511,6 +475,7 @@ export default class Train extends React.Component {
                                 <Button
                                     variant='contained'
                                     onClick={() => this.changeMode('caseselect')}
+                                    sx={{ py: 1.45 }}
                                 >
                                     Select Cases
                                 </Button>
@@ -522,6 +487,7 @@ export default class Train extends React.Component {
                             times={times}
                             confirmRem={(i) => this.confirmRem(i)}
                             confirmClear={() => this.confirmClear()}
+                            confirmUnsel={(caseNum) => this.confirmUnsel(caseNum)}
                             lastEntry={this.state.lastEntry}
                             selected={this.state.selected}
                         />

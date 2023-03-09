@@ -25,10 +25,10 @@ const columns = [
 ];
 
 /**
- * Section of stats
+ * Makes a row of stats for a certain case 
  * Includes case name, average time, and times
  */
-function TimesGroup(props) {
+function makeRow(props) {
     let sum = 0;
     let timesList = [];
     for (const i in props.caseTimes) {
@@ -52,7 +52,7 @@ function TimesGroup(props) {
         caseName: <CaseModal i={props.caseNum} confirmUnsel={props.confirmUnsel} />,
         timesList: (
             <Box sx={{ ml: 1.5 }}>
-                <Typography variant='body1' component='body1'>
+                <Typography variant='body1' component='p'>
                     {average} average<br/>
                     {timesList}
                 </Typography>
@@ -66,6 +66,27 @@ function TimesGroup(props) {
  * Sorts list of times by case and makes according TimesGroup components
  */
 export default class Stats extends React.Component {
+    /**
+     * Header with the of time entries, a button to clear the session, and instructions
+     */
+    renderHeader() {
+        return (
+            <Box sx={{ height: '15%'}}>
+                <Box sx={{ display: 'inline-flex' }}>
+                    <Typography variant='h6' component='h6'>
+                        {this.props.times.length} times
+                    </Typography>
+                    <Button sx={{ ml: 2 }} variant='outlined' onClick={() => this.props.confirmClear()}>
+                        Clear
+                    </Button>
+                </Box>
+
+                <Typography sx={{ }} variant='body1' component='p'>
+                    Click case names for case info.<br/>Click times to remove times.
+                </Typography>
+            </Box>
+        )
+    }
     /**
      * Sort list of times by case
      * @param {Object[]} times 
@@ -86,11 +107,11 @@ export default class Stats extends React.Component {
         const resultsByCase = this.getResultsByCase(this.props.times);
         const caseNums = sortBy(Object.keys(resultsByCase).map(Number));
 
-        let groupsList = [];
+        let rows = [];
         for (const i of caseNums) {
             const confirmUnsel = this.props.selected.includes(i) ? () => this.props.confirmUnsel(i) : null;
-            groupsList.push(
-                TimesGroup({
+            rows.push(
+                makeRow({
                     confirmRem: (entry) => this.props.confirmRem(entry),
                     confirmUnsel: confirmUnsel,
                     caseTimes: resultsByCase[i],
@@ -103,18 +124,7 @@ export default class Stats extends React.Component {
         return (
             <Paper sx={{ height: '100%' }} elevation={4}>
                 <Box sx={{ height: '100%', p: 2 }}>
-                    <Box sx={{ height: '5%', display: 'inline-flex' }}>
-                        <Typography variant='h6' component='h6'>
-                            {this.props.times.length} times
-                        </Typography>
-                        <Button sx={{ ml: 2 }} variant='outlined' onClick={() => this.props.confirmClear()}>
-                            Clear
-                        </Button>
-                    </Box>
-
-                    <Typography sx={{ height: '10%' }} variant='body1' component='p'>
-                        Click case names for case info.<br/>Click times to remove times.
-                    </Typography>
+                    {this.renderHeader()}
 
                     <Paper sx={{ height: '85%' }} elevation={1}>
                     <TableContainer sx={{ height: '100%', display: 'flex' }}>
@@ -134,12 +144,12 @@ export default class Stats extends React.Component {
                         </TableHead>
                         
                         <TableBody sx={{ overflow: 'auto' }}>
-                            {groupsList
-                            .map((group, index) => {
+                            {rows
+                            .map((row, index) => {
                                 return (
                                 <TableRow hover role="checkbox" tabIndex={-1} key={index}>
                                     {columns.map((column) => {
-                                    const value = group[column.id];
+                                    const value = row[column.id];
                                     return (
                                         <TableCell key={column.id} align={column.align} sx={{ p: 0 }}>
                                         {value}

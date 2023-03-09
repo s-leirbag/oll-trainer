@@ -8,7 +8,7 @@ It is heavily based on https://github.com/Roman-/oll_trainer by Roman Strakhov b
 
 ## To-do
 
-- egg mui stats clean typescript
+- scramble/timer size, mui, clean, typescript
 
 - Use Typescript
 - Improve stats list
