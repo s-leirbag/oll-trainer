@@ -81,8 +81,8 @@ export default class Stats extends React.Component {
                     </Button>
                 </Box>
 
-                <Typography sx={{ }} variant='body1' component='p'>
-                    Click cases for case info.<br/>Click times to remove times.
+                <Typography sx={{ mt: 1 }} variant='body1' component='p'>
+                    Click cases for case info. Click times to remove times. Delete: remove latest time. Shift+Delete: clear session.
                 </Typography>
             </Box>
         )
@@ -90,7 +90,7 @@ export default class Stats extends React.Component {
     /**
      * Sort list of times by case
      * @param {Object[]} times 
-     * @returns 
+     * @returns sorted list of time entries by case
      */
     getResultsByCase(times) {
         let resultsByCase = {};
@@ -107,6 +107,7 @@ export default class Stats extends React.Component {
         const resultsByCase = this.getResultsByCase(this.props.times);
         const caseNums = sortBy(Object.keys(resultsByCase).map(Number));
 
+        // Make rows for each case in the table
         let rows = [];
         for (const i of caseNums) {
             const confirmUnsel = this.props.selected.includes(i) ? () => this.props.confirmUnsel(i) : null;
@@ -128,6 +129,7 @@ export default class Stats extends React.Component {
 
                     <Paper sx={{ height: '85%' }} elevation={2}>
                     <TableContainer sx={{ height: '100%', display: 'flex' }}>
+                        {/* Table Header */}
                         <Table size='small' stickyHeader aria-label="sticky table">
                         <TableHead>
                             <TableRow>
@@ -143,6 +145,7 @@ export default class Stats extends React.Component {
                             </TableRow>
                         </TableHead>
                         
+                        {/* Body */}
                         <TableBody sx={{ overflow: 'auto' }}>
                             {rows
                             .map((row, index) => {

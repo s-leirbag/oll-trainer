@@ -1,46 +1,20 @@
 import React from 'react';
 
 import "./Train.css";
-import ModeButtons from "./ModeButtons.jsx";
+import { ModeButtons, SettingButtons } from "./TrainButtons.jsx";
 import Stats from "./Stats.jsx";
-import Timer from "../Timer/Timer.jsx";
+import Timer from "./Timer.jsx";
 import { styleSettingNames, stylePresets } from '../../StylePresets';
 import { algsInfo, ollMap } from '../../Constants';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
 import { clone, cloneDeep, sample, isEmpty } from 'lodash';
-import { msToReadable, inverseScramble, incrementRem, logTabSep } from '../../Utils';
-
-/**
- * A UI setting with its name and two buttons
- */
-function SettingButtons(props) {
-    let buttons = [];
-    for (const [name, onClick] of Object.entries(props.map)) {
-        buttons.push(
-            <Button onClick={() => onClick()} key={name}>
-                {name}
-            </Button>
-        );
-    }
-
-    return (
-        <Box sx={{ p: 1 }}>
-            <Typography variant='body1' component='p'>
-                {props.name}
-            </Typography>
-            <ButtonGroup variant="outlined" aria-label="outlined button group">
-                {buttons}
-            </ButtonGroup>
-        </Box>
-    );
-}
+import { msToReadable, inverseScramble, applyAlgRotation, incrementRem, logTabSep } from '../../Utils';
 
 /**
  * Training page
@@ -62,7 +36,7 @@ export default class Train extends React.Component {
                 'timer': 90,
                 'scramble': 20,
             }, // UI settings of timer/scramble sizes
-            styleSettings: props.styleSettings, // style passed down from
+            styleSettings: props.styleSettings, // style info passed down
         };
     }
 
@@ -137,52 +111,10 @@ export default class Train extends React.Component {
         const caseNum = sample(cases);
         const alg = inverseScramble(sample(ollMap[caseNum]));
         const rotation = sample(["", "y", "y2", "y'"]);
-        const finalAlg = this.applyAlgRotation(alg, rotation);
+        const finalAlg = applyAlgRotation(alg, rotation);
         // currentEntry includes the scramble and case number
         const newEntry = {scramble: finalAlg, case: caseNum};
         this.setState({ currentEntry: newEntry });
-    }
-
-    /**
-     * http://stackoverflow.com/questions/15604140/replace-multiple-strings-with-multiple-other-strings
-     * Replace strings in strings according to a given mapping
-     * @param {string} str 
-     * @param {Object} mapObj object describing strings to replace
-     * @returns Modified string
-     */
-    replaceAll(str,mapObj) {
-        if (!mapObj)
-            return str;
-        
-        // Join mapping keys together with | to search for matching strings to replace
-        // g flag: global, replace all matches
-        // i flag: ignore case
-        let re = new RegExp(Object.keys(mapObj).join("|"),"gi");
-
-        return str.replace(re, function(matched){
-            return mapObj[matched];
-        });
-    }
-    
-    /**
-     * Rotate an algorithm around the vertical axis accordingly
-     * @param {string} alg 
-     * @param {string} rot type of rotation to apply to algorithm using cubing notation
-     * @returns algorithm rotated
-     */
-    // returns new string with transformed algorithm.
-    // Returnes sequence of moves that get the cube to the same position as (alg + rot) does, but without cube rotations.
-    // Example: applyAlgRotation("R U R'", "y") = "F U F'"
-    applyAlgRotation(alg, rot) {
-        let mapObj;
-        if (rot==="y")
-            mapObj = {R:"F",F:"L",L:"B",B:"R"};
-        if (rot==="y'")
-            mapObj = {R:"B",B:"L",L:"F",F:"R"};
-        if (rot==="y2")
-            mapObj = {R:"L",L:"R",B:"F",F:"B"};
-
-        return this.replaceAll(alg, mapObj);
     }
 
     /**
@@ -271,7 +203,7 @@ export default class Train extends React.Component {
      * @param {Object} newStyle 
      */
     applyStyle(newStyle) {
-        let style = clone(this.state.styleSettings);
+        let style = cloneDeep(this.state.styleSettings);
 
         for (const propertyName of styleSettingNames) {
             if (newStyle.hasOwnProperty(propertyName))
@@ -281,16 +213,6 @@ export default class Train extends React.Component {
         this.setState({ styleSettings: style })
         this.props.applyStyle(style);
     }
-
-    /**
-     * Change a color in the style settings based on an input event
-     * @param {string} propertyName 
-     * @param {Object} event 
-     */
-    // https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-controlled-component
-    handleColorInputChange = (propertyName, event) => {
-        // this.applyStyle({ [propertyName]: event.target.value });
-    };
 
     /**
      * Adjust the size of the timer or scramble
@@ -325,7 +247,7 @@ export default class Train extends React.Component {
     }
 
     /**
-     * Change the trainig mode to random/recap
+     * Change the training mode to random/recap
      * @param {string} accent 
      */
     changeMode(newMode) {
@@ -336,8 +258,8 @@ export default class Train extends React.Component {
     }
 
     /**
-     * Render the customization setting buttons at the bottom of the train page
-     * @returns jsx for settings
+     * Render the customization buttons
+     * @returns jsx for customization buttons
      */
     renderSettings() {
         const settings = {
@@ -359,7 +281,7 @@ export default class Train extends React.Component {
                 '🍊': () => this.setAccent('orange'),
                 '🌻': () => this.setAccent('yellow'),
                 '🐸': () => this.setAccent('green'),
-                '🥶': () => this.setAccent('blue'),
+                '🧊': () => this.setAccent('blue'),
                 '💜': () => this.setAccent('purple'),
                 '🌸': () => this.setAccent('pink'),
             },
@@ -376,11 +298,6 @@ export default class Train extends React.Component {
         );
     }
 
-    /**
-     * Render page
-     * Use user's style settings, pass needed info along
-     * @returns Train jsx
-     */
     render() {
         const sizes = this.state.sizes;
         const style = this.state.styleSettings;
@@ -390,7 +307,7 @@ export default class Train extends React.Component {
         
         let nCases, nCasesText, scramble, lastScramInfo;
 
-        // nCases is the note at the top saying the # of cases
+        // nCases + nCasesText is the note at the top saying the # of cases
         if (nSelected > 0) {
             if (this.state.mode === 'random') {
                 nCases = nSelected;
@@ -401,6 +318,7 @@ export default class Train extends React.Component {
                 nCasesText = ' cases left';
             }
             // currentEntry is null on the first frame
+            // So only show the scramble when the scramble for the currentEntry is made
             if (currentEntry)
                 scramble = "scramble: " + currentEntry.scramble;
         } else {
@@ -409,10 +327,10 @@ export default class Train extends React.Component {
             scramble = "click \"select cases\" above and pick some OLLs to practice";
         }
 
-        // Display the last scramble if applicable, and a button to remove it from the selection of cases
+        // Display the last scramble if applicable, and a button to unselect it
         const lastCase = this.state.lastEntry.case;
         if (!isEmpty(times) && lastCase !== -1) {
-            let button = "";
+            let button = '';
             if (this.state.selected.includes(lastCase))
                 button = (
                     <Button sx={{ ml: 2 }} variant='outlined' onClick={() => this.confirmUnsel(lastCase)}>

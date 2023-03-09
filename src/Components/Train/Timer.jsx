@@ -85,7 +85,6 @@ export default class Timer extends React.Component {
         let color = stage === "prep" ? this.props.prepColor : null;
         
         return (
-
             <Paper
                 sx={{
                     color: color,

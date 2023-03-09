@@ -1,3 +1,8 @@
+/**
+ * Style info
+ * Tracks palette, timer/scramble size, accent color, light/dark mode
+ */
+
 export const styleSettingNames = ['timerFontSize', 'scrambleFontSize', 'accent',  'accentColor', 'mode', 'primary'];
 
 export const defaultStyle = {

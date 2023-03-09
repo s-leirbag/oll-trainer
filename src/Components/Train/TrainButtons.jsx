@@ -1,12 +1,41 @@
 import React from 'react';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
 import Popover from '@mui/material/Popover';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 
 /**
- * Data for buttons and popover
+ * A UI setting with its name and buttons
+ * Uses a map of button names to callbacks
+ * So you can have any number of buttons you want
+ */
+export function SettingButtons(props) {
+    let buttons = [];
+    for (const [name, onClick] of Object.entries(props.map)) {
+        buttons.push(
+            <Button onClick={() => onClick()} key={name}>
+                {name}
+            </Button>
+        );
+    }
+
+    return (
+        <Box sx={{ p: 1 }}>
+            <Typography variant='body1' component='p'>
+                {props.name}
+            </Typography>
+            <ButtonGroup variant="outlined" aria-label="outlined button group">
+                {buttons}
+            </ButtonGroup>
+        </Box>
+    );
+}
+
+/**
+ * Data for toggle mode buttons and popover
  */
 const buttonData = {
     'Random': {
@@ -22,16 +51,21 @@ const buttonData = {
 /**
  * Toggle buttons to change between random/recap training modes
  */
-export default class ModeButtons extends React.Component {
+export class ModeButtons extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             mode: props.mode, // mode, random/recap
-            hovered: props.mode, // hovered mode for popover (know which description to display)
+            hovered: props.mode, // hovered mode for popover (to know which description to display)
             open: false, // is popover open?
         };
     }
 
+    /**
+     * Set new mode given input
+     * @param {Object} event 
+     * @param {String} newMode 
+     */
     handleMode(event, newMode) {
         if (newMode !== null) {
             this.setState({ mode: newMode });
@@ -39,14 +73,25 @@ export default class ModeButtons extends React.Component {
         }
     };
 
+    /**
+     * Set which mode is hovered
+     * @param {String} name 
+     */
     setHovered(name) {
         this.setState({ hovered: name });
     }
 
+    /**
+     * Open the popover and anchor it properly
+     * @param {Object} event 
+     */
     handlePopoverOpen(event) {
         this.setState({ open: true, anchorEl: event.currentTarget });
     };
 
+    /**
+     * Hide the popover
+     */
     handlePopoverClose() {
         this.setState({ open: false });
     };
@@ -54,6 +99,9 @@ export default class ModeButtons extends React.Component {
     render() {
         const open = this.state.open;
 
+        /**
+         * Render buttons
+         */
         let buttons = [];
         for (const [name, data] of Object.entries(buttonData)) {
             buttons.push(
@@ -70,6 +118,9 @@ export default class ModeButtons extends React.Component {
             );
         }
 
+        /**
+         * Render popover if it is open
+         */
         let popover = '';
         if (open) {
             const name = this.state.hovered;

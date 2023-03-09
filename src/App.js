@@ -5,11 +5,11 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { styleSettingNames, defaultStyle } from './StylePresets.js';
 
-import Egg from './Components/Egg/Egg.jsx'
+import Egg from './Components/Train/Egg.jsx'
 import CaseSelect from './Components/CaseSelect/CaseSelect.jsx';
 import Train from './Components/Train/Train.jsx';
 
-import { clone } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { logTabSep } from './Utils';
 
 /**
@@ -69,7 +69,7 @@ export default class App extends React.Component {
       selected: [], // selected cases in the form of case number
       times: [], // stat entries from previously timed cases in training
       lastEntry: {}, // entry from last case timed in training
-      style: clone(defaultStyle), // tracks style settings for user
+      style: cloneDeep(defaultStyle), // tracks style settings for user
     };
   }
 
@@ -135,7 +135,7 @@ export default class App extends React.Component {
    * @param {Object} newStyle 
    */
   saveStyle(newStyle) {
-    let style = this.state.style;
+    let style = cloneDeep(this.state.style);
 
     for (const propertyName of styleSettingNames) {
       if (newStyle.hasOwnProperty(propertyName))
@@ -143,15 +143,15 @@ export default class App extends React.Component {
     }
 
     this.setState({ style: style })
-    // saveLocal('style', JSON.stringify(style));
+    saveLocal('style', JSON.stringify(style));
   }
   
   /**
    * Load style settings
    */
   loadStyle() {
-    const defaultStyleeeee = clone(defaultStyle);
-    let style = JSON.parse(loadLocal('style', JSON.stringify(defaultStyleeeee)));
+    const defaultStyleCopy = cloneDeep(defaultStyle);
+    let style = JSON.parse(loadLocal('style', JSON.stringify(defaultStyleCopy)));
     this.saveStyle(style);
   }
 
@@ -172,12 +172,12 @@ export default class App extends React.Component {
   /**
    * Render app
    * Show appropriate component based on mode
-   * Use user's style settings, pass needed info along
+   * Use user's style customization
    * @returns App jsx
    */
   render() {
     let app;
-    // Component CaseSelect is the front page for selecting cases
+    // CaseSelect is the front page for selecting cases
     if (this.state.mode === 'caseselect') {
       app = (
         <CaseSelect
@@ -189,7 +189,7 @@ export default class App extends React.Component {
           key={this.state.selected}
         />
       );
-    // Component Train is the training/timing page for mode random or recap
+    // Train is the training/timing page
     } else {
       app = (
         <Train
@@ -206,10 +206,13 @@ export default class App extends React.Component {
       );
     }
 
+    // Generate user-customized theme using mode, palette, timer/scramble font size
     const style = this.state.style;
-
     const theme = createTheme({
-      palette: style,
+      palette: {
+        mode: style.mode,
+        primary: style.primary,
+      },
       typography: {
         timer: {
           fontWeight: 300,
@@ -226,7 +229,6 @@ export default class App extends React.Component {
       }
     })
 
-    // Leave Easter egg button on both selection and training pages
     return (
       <div className="App">
       <ThemeProvider theme={theme}>

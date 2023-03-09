@@ -1,3 +1,6 @@
+/**
+ * Log input to the console separated by tabs
+ */
 export function logTabSep() {
     console.log(Array.prototype.slice.call(arguments).join('\t>'));
 }
@@ -51,6 +54,48 @@ export function inverseScramble(s) {
     }
 
     return result.substring(0, result.length-1);
+}
+
+/**
+ * http://stackoverflow.com/questions/15604140/replace-multiple-strings-with-multiple-other-strings
+ * Replace strings in strings according to a given mapping
+ * @param {string} str 
+ * @param {Object} mapObj object describing strings to replace
+ * @returns Modified string
+ */
+export function replaceAll(str,mapObj) {
+    if (!mapObj)
+        return str;
+    
+    // Join mapping keys together with | to search for matching strings to replace
+    // g flag: global, replace all matches
+    // i flag: ignore case
+    let re = new RegExp(Object.keys(mapObj).join("|"),"gi");
+
+    return str.replace(re, function(matched){
+        return mapObj[matched];
+    });
+}
+
+/**
+ * Rotate an algorithm around the vertical axis accordingly
+ * @param {string} alg 
+ * @param {string} rot type of rotation to apply to algorithm using cubing notation
+ * @returns algorithm rotated
+ */
+// returns new string with transformed algorithm.
+// Returnes sequence of moves that get the cube to the same position as (alg + rot) does, but without cube rotations.
+// Example: applyAlgRotation("R U R'", "y") = "F U F'"
+export function applyAlgRotation(alg, rot) {
+    let mapObj;
+    if (rot==="y")
+        mapObj = {R:"F",F:"L",L:"B",B:"R"};
+    if (rot==="y'")
+        mapObj = {R:"B",B:"L",L:"F",F:"R"};
+    if (rot==="y2")
+        mapObj = {R:"L",L:"R",B:"F",F:"B"};
+
+    return replaceAll(alg, mapObj);
 }
 
 /**

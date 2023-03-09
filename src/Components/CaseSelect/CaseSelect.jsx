@@ -186,7 +186,7 @@ export default class CaseSelect extends React.Component {
      */
     render() {
         // Header for all cases
-        const topHeader = (
+        const allCasesHeader = (
             <tr><GroupHeader
                 key='allHeader'
                 onClick={() => this.toggleAll()}
@@ -218,21 +218,21 @@ export default class CaseSelect extends React.Component {
                         <br/><br/>GitHub repo: <Link href='https://github.com/s-leirbag/oll-trainer'>click</Link>
                     </Typography>
                 </Box>
-            {/* Case headers/tiles */}
-            <table><tbody>
-                {topHeader}
-                {cases}
-            </tbody></table>
-            {/* Button to switch to the training page */}
-            <Button
-                variant='contained'
-                onClick={() => this.props.changeMode(this.props.trainMode)}
-                title='Train your selected cases'
-                size='large'
-                sx={{ fontSize: 50, position: 'fixed', top: 10, right: 10 }}
-            >
-                Train
-            </Button>
+                {/* Cases table of headers and tiles */}
+                <table><tbody>
+                    {allCasesHeader}
+                    {cases}
+                </tbody></table>
+                {/* Button to switch to the training page */}
+                <Button
+                    variant='contained'
+                    onClick={() => this.props.changeMode(this.props.trainMode)}
+                    title='Train your selected cases'
+                    size='large'
+                    sx={{ fontSize: 50, position: 'fixed', top: 10, right: 10 }}
+                >
+                    Train
+                </Button>
             </Container>
             </Paper>
         );

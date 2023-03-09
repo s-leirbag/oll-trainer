@@ -32,6 +32,7 @@ export default function CaseModal(props) {
     const alg1 = algsInfo[i]["a"];
     const alg2 = algsInfo[i]["a2"];
 
+    // Show an alternative algorithm for the case if one exists
     let altAlg = '';
     if (alg2 !== "") {
       altAlg = (
@@ -42,6 +43,7 @@ export default function CaseModal(props) {
       );
     }
   
+    // Offer a button to unselect the case if given the confirmUnsel prop
     let unselButton = "";
     if (props.confirmUnsel)
       unselButton = (
