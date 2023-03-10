@@ -324,7 +324,7 @@ export default class Train extends React.Component {
         } else {
             nCases = 0;
             nCasesText = ' cases selected';
-            scramble = "click \"select cases\" above and pick some OLLs to practice";
+            scramble = "click \"select cases\" and pick some OLLs to practice";
         }
 
         // Display the last scramble if applicable, and a button to unselect it

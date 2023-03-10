@@ -17,6 +17,9 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
+/**
+ * DialogTitle with 'x' icon to close
+ */
 function BootstrapDialogTitle(props) {
   const { children, onClose, ...other } = props;
 
@@ -41,9 +44,16 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
+/**
+ * Custom Material alert/confirm dialog
+ * If handleAgree is provided, the dialog will have agree/disagree buttons
+ * Did not provide onClose to the Dialog, so you cannot escape/click out of it
+ * Takes in a title prop for the alert and 'open' to open/close it
+ */
 export default function Alert(props) {
   const { open, title, handleClose, handleAgree } = props;
 
+  // If handleAgree is provided, the dialog will have agree/disagree buttons
   let actions = ''
   if (handleAgree) {
     const handleAgreeThenClose = () => {

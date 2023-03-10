@@ -8,8 +8,8 @@ It is heavily based on https://github.com/Roman-/oll_trainer by Roman Strakhov b
 
 ## To-do
 
-- MUI alerts/confirms
 - Use Typescript
+- Add prop type checking with PropTypes
 
 ## Credits
 

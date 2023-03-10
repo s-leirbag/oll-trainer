@@ -71,8 +71,8 @@ export default class App extends React.Component {
       times: [], // stat entries from previously timed cases in training
       lastEntry: {}, // entry from last case timed in training
       style: cloneDeep(defaultStyle), // tracks style settings for user
-      alertOpen: false,
-      alertInfo: { title: null, handleAgree: null },
+      alertOpen: false, // is alert open
+      alertInfo: { title: null, handleAgree: null }, // title & callback for alert
     };
   }
 
@@ -172,10 +172,19 @@ export default class App extends React.Component {
       this.setState({ trainMode: mode });
   }
 
+  /**
+   * Open/close the alert
+   * @param {Boolean} val 
+   */
   setAlertOpen(val) {
     this.setState({ alertOpen: val });
   }
 
+  /**
+   * Make alert with given title and optional callback
+   * @param {string} title 
+   * @param {callback} [handleAgree] optional callback for user to agree to
+   */
   setAlert(title, handleAgree) {
     this.setAlertOpen(true);
     this.setState({ alertInfo: { title: title, handleAgree: handleAgree }});
@@ -185,6 +194,7 @@ export default class App extends React.Component {
    * Render app
    * Show appropriate component based on mode
    * Use user's style customization
+   * Show alert if prompted by easter egg or action confirmations
    * @returns App jsx
    */
   render() {
@@ -198,6 +208,9 @@ export default class App extends React.Component {
           trainMode={this.state.trainMode}
           changeMode={(mode) => this.changeMode(mode)}
           styleSettings={this.state.style}
+          // Re-render selection when selection changes
+          // Fixes bug on initial load where visual selection is blank
+          // While actual selection exists
           key={this.state.selected}
         />
       );
@@ -242,8 +255,10 @@ export default class App extends React.Component {
       }
     })
 
+    // For alert for easter eggs/action confirmations
     const alertOpen = this.state.alertOpen;
     const alertInfo = this.state.alertInfo;
+
     return (
       <div className="App">
       <ThemeProvider theme={theme}>
