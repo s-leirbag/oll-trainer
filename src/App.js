@@ -5,6 +5,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { styleSettingNames, defaultStyle } from './StylePresets.js';
 
+import Alert from './Components/Alert.jsx'
 import Egg from './Components/Train/Egg.jsx'
 import CaseSelect from './Components/CaseSelect/CaseSelect.jsx';
 import Train from './Components/Train/Train.jsx';
@@ -70,6 +71,8 @@ export default class App extends React.Component {
       times: [], // stat entries from previously timed cases in training
       lastEntry: {}, // entry from last case timed in training
       style: cloneDeep(defaultStyle), // tracks style settings for user
+      alertOpen: false,
+      alertInfo: { title: null, handleAgree: null },
     };
   }
 
@@ -169,6 +172,15 @@ export default class App extends React.Component {
       this.setState({ trainMode: mode });
   }
 
+  setAlertOpen(val) {
+    this.setState({ alertOpen: val });
+  }
+
+  setAlert(title, handleAgree) {
+    this.setAlertOpen(true);
+    this.setState({ alertInfo: { title: title, handleAgree: handleAgree }});
+  }
+
   /**
    * Render app
    * Show appropriate component based on mode
@@ -202,6 +214,7 @@ export default class App extends React.Component {
           lastEntry={this.state.lastEntry}
           applyStyle={(style) => this.saveStyle(style)}
           styleSettings={this.state.style}
+          alert={(title, handleAgree) => this.setAlert(title, handleAgree)}
         />
       );
     }
@@ -229,12 +242,20 @@ export default class App extends React.Component {
       }
     })
 
+    const alertOpen = this.state.alertOpen;
+    const alertInfo = this.state.alertInfo;
     return (
       <div className="App">
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        <Alert
+          open={alertOpen}
+          title={alertInfo.title}
+          handleClose={() => this.setAlertOpen(false)}
+          handleAgree={alertInfo.handleAgree}
+        />
         {app}
-        <Egg />
+        <Egg alert={(title, handleAgree) => this.setAlert(title, handleAgree)} />
       </ThemeProvider>
       </div>
     );

@@ -107,9 +107,9 @@ export default class Egg extends React.Component {
             crackLevel += 1;
             img = IMAGE_INDEX[crackLevel];
             if (crackLevel === 1)
-                alert('Ouch! Please don\'t hurt me more...');
+                this.props.alert('Ouch! Please don\'t hurt me more...');
             if (crackLevel === 2)
-                alert('OOOOUUCH! You killed Mr. Egg.');
+                this.props.alert('OOOOUUCH! You killed Mr. Egg.');
 
             // Reset click times for next crack level
             clickTimes = [];

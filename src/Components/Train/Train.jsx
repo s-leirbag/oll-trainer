@@ -136,7 +136,7 @@ export default class Train extends React.Component {
      */
     confirmRem(i) {
         const ms = this.state.times[i].ms;
-        if (window.confirm("Are you sure you want to remove this time?\n\n" + ms)) {
+        this.props.alert('Are you sure you want to remove this time? (' + ms + ')', () => {
             let timesCopy = cloneDeep(this.state.times);
             timesCopy.splice(i, 1);
             timesCopy = this.updateEntryIndeces(timesCopy);
@@ -145,7 +145,7 @@ export default class Train extends React.Component {
 
             this.setState({ times: timesCopy, lastEntry: newLastEntry });
             this.props.saveTrainInfo({ times: timesCopy, lastEntry: newLastEntry });
-        }
+        });
     }
 
     /**
@@ -164,12 +164,12 @@ export default class Train extends React.Component {
      */
     confirmClear() {
         if (this.state.times.length > 0) {
-            if (window.confirm("Are you sure you want to clear session?")) {
+            this.props.alert("Are you sure you want to clear session?", () => {
                 this.setState({times: []});
                 this.props.saveTrainInfo({times: []});
-            }
+            })
         } else {
-            alert('Session is already empty');
+            this.props.alert('Session is already empty');
         }
     }
 
@@ -178,7 +178,7 @@ export default class Train extends React.Component {
      * @param {number} caseNum number of case to unselect
      */
     confirmUnsel(caseNum) {
-        if (window.confirm("Do you want to unselect this case?")) {
+        this.props.alert('Do you want to unselect this case?', () => {
             let newSelected = clone(this.state.selected);
             newSelected.splice(newSelected.indexOf(caseNum), 1);
 
@@ -195,7 +195,7 @@ export default class Train extends React.Component {
             }
             this.setState({ selected: newSelected });
             this.props.saveSelection(newSelected);
-        }
+        });
     }
 
     /**
